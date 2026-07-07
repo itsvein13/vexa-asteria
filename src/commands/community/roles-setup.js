@@ -79,6 +79,11 @@ export default {
                     label: "Minecraft",
                     value: "minecraft",
                     emoji: "⛏"
+                },
+                   {
+                    label: "Racing Master",
+                    value: "racing_master",
+                    emoji: "🏁"
                 }
             );
 

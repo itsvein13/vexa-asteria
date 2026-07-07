@@ -9,7 +9,8 @@ const GAME_ROLES = {
     ml: roles.ML,
     roblox: roles.ROBLOX,
     cs2: roles.CS2,
-    minecraft: roles.MINECRAFT
+    minecraft: roles.MINECRAFT,
+    racing_master: roles.RACING_MASTER,
 };
 
 export default {
