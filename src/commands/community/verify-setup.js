@@ -20,15 +20,18 @@ export default {
             .setColor("#7C3AED")
             .setTitle("👋 Welcome to Synd1cate")
             .setDescription([
-                "Welcome aboard! 💜",
+                "Glad to have you here! 💜",
                 "",
-                "You're just one step away from joining the community.",
+                "Hit the button below to unlock the server and start hanging out with the community.",
                 "",
-                "Click **🚀 Join Synd1cate** below to unlock the **Wanderer** role and get access to every chat, voice channel, events, and exclusive community features.",
+                "✨ Full server access",
+                "💬 Community chats",
+                "🎮 Gaming channels",
+                "🎉 Events & more",
                 "",
-                "**See you around, Wanderer. 🚀**"
+                "**See you around, Wanderer! 🚀**"
             ].join("\n"))
-            .setImage("https://cdn.discordapp.com/attachments/1309675924417024100/1475437037401407518/SYND1CATE.png?ex=6a4d7b92&is=6a4c2a12&hm=d3abb3182f80d9ea11455d1002871199f593d2f247f4472c381adb95dc9c9d16&")
+            .setImage("https://cdn.discordapp.com/attachments/1406140289344602192/1524290616010346496/VERIFY_HERE.png?ex=6a4f35c2&is=6a4de442&hm=4cc85374c5ea0df48ad96170b39d51d3621dcdd5645fb2732257d1eb25a3d225&")
             .setFooter({
                 text: "Powered by Vexa"
             });

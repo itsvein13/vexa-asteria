@@ -16,7 +16,7 @@ export default {
         // Banner FAQ
         const banner = new EmbedBuilder()
             .setColor("#7C3AED")
-            .setImage("https://YOUR_FAQ_BANNER_HERE.png");
+            .setImage("https://media.discordapp.net/attachments/1406140289344602192/1524289547280846878/FAQ.png?ex=6a4f34c4&is=6a4de344&hm=3c35ffd3ec8b2a4fd3e98ca088a6a67f68058bc44a048d17b12ce320ceee8675&=&format=webp&quality=lossless&width=1526&height=859");
 
         // Getting Started
         const gettingStarted = new EmbedBuilder()
