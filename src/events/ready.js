@@ -43,7 +43,12 @@ export default {
                 {
                     name: "BANG ASLE? PANTEEEEKK",
                     type: ActivityType.Watching
+                },
+                {
+                    name: "Commands /help",
+                    type: ActivityType.Watching
                 }
+
 
             ];
 
