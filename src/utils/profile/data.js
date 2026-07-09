@@ -77,16 +77,16 @@ export function getProfileData(member) {
     const badges = [];
 
     if (roles.has(ROLES.OVERLORD))
-        badges.push({ emoji: "👑", label: "Overlord" });
+        badges.push({ emoji: "👑", label: "Overlord", icon: "overlord" });
 
     if (roles.has(ROLES.WANDERER))
-        badges.push({ emoji: "🧭", label: "Wanderer" });
+        badges.push({ emoji: "🧭", label: "Wanderer", icon: "wanderer" });
 
     if (roles.has(ROLES.STREAMER))
-        badges.push({ emoji: "📹", label: "Streamer" });
+        badges.push({ emoji: "📹", label: "Streamer", icon: "streamer" });
 
     if (roles.has(ROLES.HUMAN_BEING))
-        badges.push({ emoji: "👤", label: "Human" });
+        badges.push({ emoji: "👤", label: "Human", icon: "human" });
 
     return {
 

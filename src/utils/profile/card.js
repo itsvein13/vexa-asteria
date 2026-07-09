@@ -12,6 +12,8 @@ import { drawGames, getGamesGridHeight } from "./drawGames.js";
 import { drawPanel } from "./drawPanel.js";
 import { drawParticles } from "./drawParticles.js";
 import LAYOUT from "../../config/layout.js";
+import GAME_ICONS from "../../config/gameIcons.js";
+import { loadIcon } from "./icons.js";
 import {
     createCanvas,
     loadImage
@@ -44,7 +46,7 @@ async function getBackgroundImage() {
  * ambient particle twinkle and the XP bar shimmer for animated export;
  * a static render just calls this once with time=0.
  */
-function renderFrame(ctx, { member, profile, tier, levelData, avatarImage, backgroundImage, joinedDate, discordSince, time }) {
+function renderFrame(ctx, { member, profile, tier, levelData, avatarImage, backgroundImage, badgeIcons, gameIcons, joinedDate, discordSince, time }) {
 
     // ==========================
     // Background + ambient particles
@@ -119,6 +121,7 @@ function renderFrame(ctx, { member, profile, tier, levelData, avatarImage, backg
     if (profile.badges.length) {
         drawBadges(ctx, {
             badges: profile.badges,
+            icons: badgeIcons,
             x: badgesPanelX + 22,
             y: rowY + 66,
             tier
@@ -142,6 +145,7 @@ function renderFrame(ctx, { member, profile, tier, levelData, avatarImage, backg
     if (profile.games.length) {
         drawGames(ctx, {
             games: profile.games,
+            icons: gameIcons,
             x: gamesPanelX + 22,
             y: rowY + 74,
             tier
@@ -194,6 +198,20 @@ async function prepareRenderData(member) {
         getBackgroundImage()
     ]);
 
+    // Preload icon badge & game (cached, null kalau file tidak ada —
+    // fungsi draw yang menentukan fallback-nya).
+    const badgeIcons = {};
+
+    await Promise.all(profile.badges.map(async badge => {
+        badgeIcons[badge.label] = await loadIcon("badges", badge.icon);
+    }));
+
+    const gameIcons = {};
+
+    await Promise.all(profile.games.map(async game => {
+        gameIcons[game] = await loadIcon("games", GAME_ICONS[game]);
+    }));
+
     const joinedDate = profile.joinedAt.toLocaleDateString("en-GB", {
         day: "numeric", month: "short", year: "numeric"
     });
@@ -202,7 +220,7 @@ async function prepareRenderData(member) {
         day: "numeric", month: "short", year: "numeric"
     });
 
-    return { profile, tier, levelData, avatarImage, backgroundImage, joinedDate, discordSince };
+    return { profile, tier, levelData, avatarImage, backgroundImage, badgeIcons, gameIcons, joinedDate, discordSince };
 
 }
 

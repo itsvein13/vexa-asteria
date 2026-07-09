@@ -6,6 +6,8 @@ export function drawChip(ctx, {
 
     text,
 
+    icon = null,
+
     x,
 
     y,
@@ -42,21 +44,33 @@ export function drawChip(ctx, {
 
     ctx.restore();
 
-    // Small accent dot
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(x + 14, y + height / 2, 3, 0, Math.PI * 2);
-    ctx.fillStyle = accent;
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 6;
-    ctx.fill();
-    ctx.restore();
+    // Icon game (kalau ada) menggantikan accent dot; teks bergeser.
+    let textX = x + 24;
+
+    if (icon) {
+
+        const size = 20;
+        ctx.drawImage(icon, x + 10, y + (height - size) / 2, size, size);
+        textX = x + 38;
+
+    } else {
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x + 14, y + height / 2, 3, 0, Math.PI * 2);
+        ctx.fillStyle = accent;
+        ctx.shadowColor = accent;
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.restore();
+
+    }
 
     drawText(ctx, {
 
         text,
 
-        x: x + 24,
+        x: textX,
 
         y: y + height / 2 + 5,
 

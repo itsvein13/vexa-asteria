@@ -30,6 +30,8 @@ export function drawGames(ctx, {
 
     games,
 
+    icons = {},
+
     x,
 
     y,
@@ -52,6 +54,7 @@ export function drawGames(ctx, {
 
         drawChip(ctx, {
             text: game,
+            icon: icons[game] ?? null, // "+N more" tidak punya icon
             x: x + col * (CHIP_WIDTH + COLUMN_GAP),
             y: y + row * ROW_HEIGHT,
             width: CHIP_WIDTH,

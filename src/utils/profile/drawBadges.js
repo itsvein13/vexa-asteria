@@ -28,6 +28,7 @@ export function getBadgesGridHeight(count) {
  */
 export function drawBadges(ctx, {
     badges,
+    icons = {},
     x,
     y,
     tier
@@ -58,15 +59,28 @@ export function drawBadges(ctx, {
         ctx.stroke();
         ctx.restore();
 
-        // Emoji
-        drawText(ctx, {
-            text: badge.emoji,
-            x: cx,
-            y: cy + 8,
-            font: "22px Poppins",
-            color: COLORS.text,
-            align: "center"
-        });
+        // Icon PNG (utama) — emoji hanya fallback kalau file icon
+        // tidak ada. Emoji butuh font emoji sistem yang tidak tersedia
+        // di container Linux (Railway), jadi PNG adalah jalur utamanya.
+        const icon = icons[badge.label];
+
+        if (icon) {
+
+            const size = 30;
+            ctx.drawImage(icon, cx - size / 2, cy - size / 2, size, size);
+
+        } else {
+
+            drawText(ctx, {
+                text: badge.emoji,
+                x: cx,
+                y: cy + 8,
+                font: "22px Poppins",
+                color: COLORS.text,
+                align: "center"
+            });
+
+        }
 
         // Caption
         drawText(ctx, {
