@@ -11,7 +11,27 @@ export default {
 
         console.log(`✅ ${client.user.tag} is online!`);
 
-        const guild = client.guilds.cache.get(GUILD_ID);
+        // Ambil guild dari env; kalau env kosong/salah, fallback ke
+        // server pertama tempat bot berada (Vexa single-guild).
+        // Log diagnostik biar salah konfigurasi langsung kelihatan.
+        let guild = client.guilds.cache.get(GUILD_ID);
+
+        if (!guild) {
+
+            console.warn(
+                `⚠️ GUILD_ID ${GUILD_ID ? `"${GUILD_ID}" tidak cocok` : "belum di-set"} — ` +
+                `fallback ke guild pertama di cache.`
+            );
+
+            guild = client.guilds.cache.first();
+
+        }
+
+        console.log(
+            guild
+                ? `🏠 Guild aktif: ${guild.name} (${guild.memberCount} members)`
+                : "❌ Bot tidak berada di guild mana pun!"
+        );
 
         let index = 0;
 
@@ -43,12 +63,7 @@ export default {
                 {
                     name: "BANG ASLE? PANTEEEEKK",
                     type: ActivityType.Watching
-                },
-                {
-                    name: "Commands /help",
-                    type: ActivityType.Watching
                 }
-
 
             ];
 
