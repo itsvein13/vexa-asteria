@@ -3,7 +3,7 @@ import ROLES from "./roles.js";
 /**
  * Rarity/tier system — card treatment (accent color, glow, label)
  * driven by the member's actual role, like a trading-card rarity.
- * Priority: Overlord > Streamer > Wanderer > Initiate.
+ * Priority: Overlord > Streamer > Ladies > Wanderer > Initiate.
  */
 const TIERS = {
 
@@ -16,11 +16,19 @@ const TIERS = {
     },
 
     epic: {
-        label: "EPIC",
+        label: "STREAMER",
         color: "#FB4570",
         glow: "#FF2E63",
         soft: "rgba(251,69,112,0.14)",
         border: "rgba(251,69,112,0.4)"
+    },
+
+    ladies: {
+        label: "LADIES",
+        color: "#FF8FD8",
+        glow: "#FF5EC4",
+        soft: "rgba(255,143,216,0.14)",
+        border: "rgba(255,143,216,0.4)"
     },
 
     rare: {
@@ -47,6 +55,7 @@ export function getTier(member) {
 
     if (roles.has(ROLES.OVERLORD)) return TIERS.legendary;
     if (roles.has(ROLES.STREAMER)) return TIERS.epic;
+    if (roles.has(ROLES.LADIES)) return TIERS.ladies;
     if (roles.has(ROLES.WANDERER)) return TIERS.rare;
 
     return TIERS.common;
