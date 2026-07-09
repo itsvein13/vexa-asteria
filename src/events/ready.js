@@ -1,10 +1,10 @@
 import { ActivityType } from "discord.js";
 
-const GUILD_ID = "1264187541205155901";
+const GUILD_ID = process.env.GUILD_ID;
 
 export default {
 
-    name: "ready",
+    name: "clientReady",
     once: true,
 
     async execute(client) {

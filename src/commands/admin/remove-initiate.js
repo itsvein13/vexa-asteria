@@ -1,6 +1,7 @@
 import {
     SlashCommandBuilder,
-    PermissionFlagsBits
+    PermissionFlagsBits,
+    MessageFlags
 } from "discord.js";
 
 import roles from "../../config/roles.js";
@@ -14,42 +15,34 @@ export default {
 
     async execute(interaction) {
 
-        console.log("STEP 1");
-
-        await interaction.deferReply({ ephemeral: true });
-
-        console.log("STEP 2");
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         const guild = interaction.guild;
 
-        console.log("STEP 3");
-
         await guild.members.fetch();
 
-        console.log("STEP 4");
-
         let removed = 0;
+        let failed = 0;
 
         for (const member of guild.members.cache.values()) {
 
-            if (member.roles.cache.has(roles.INITIATE)) {
+            if (!member.roles.cache.has(roles.INITIATE)) continue;
 
-                console.log(`Removing ${member.user.tag}`);
-
-                await member.roles.remove(roles.INITIATE);
-
+            try {
+                await member.roles.remove(roles.INITIATE, "Vexa: /remove-initiate");
                 removed++;
-
+            } catch (error) {
+                failed++;
+                console.error(`remove-initiate gagal untuk ${member.user.tag}: ${error.message}`);
             }
 
         }
 
-        console.log("STEP 5");
-
         await interaction.editReply({
-            content: `Removed ${removed}`
+            content: `✅ Role Initiate dilepas dari **${removed}** member.` +
+                (failed ? ` (${failed} gagal — cek log)` : "")
         });
 
     }
 
-}
+};
