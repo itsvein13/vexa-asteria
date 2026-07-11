@@ -41,6 +41,20 @@ const getRow = db.prepare(
     "SELECT last_claim_at, streak FROM daily WHERE user_id = ? AND guild_id = ?"
 );
 
+/**
+ * Streak daily member untuk ditampilkan (mis. di profile card).
+ * Balikin 0 kalau streak sudah putus (terakhir klaim sebelum kemarin).
+ */
+export function getDailyStreak(userId, guildId, now = Date.now()) {
+
+    const row = getRow.get(userId, guildId);
+    if (!row) return 0;
+
+    const alive = wibDayKey(row.last_claim_at) >= wibDayKey(now) - 1;
+    return alive ? row.streak : 0;
+
+}
+
 const upsertClaim = db.prepare(`
     INSERT INTO daily (user_id, guild_id, last_claim_at, streak)
     VALUES (@userId, @guildId, @lastClaimAt, @streak)

@@ -2,7 +2,9 @@ import { getProfileData } from "./data.js";
 import { getTier } from "../../config/tiers.js";
 import THEMES from "../../config/themes.js";
 import { getActiveTheme } from "../../database/profileSettings.js";
-import { getLevelData } from "../../database/levels.js";
+import { getLevelData, getRank } from "../../database/levels.js";
+import { getBalance } from "../../database/economy.js";
+import { getDailyStreak } from "../../database/daily.js";
 import { drawAvatar } from "./drawAvatar.js";
 import { drawIdentity } from "./drawIdentity.js";
 import { drawBackground } from "./drawBackground.js";
@@ -46,7 +48,7 @@ async function getBackgroundImage() {
  * ambient particle twinkle and the XP bar shimmer for animated export;
  * a static render just calls this once with time=0.
  */
-function renderFrame(ctx, { member, profile, tier, levelData, avatarImage, backgroundImage, badgeIcons, gameIcons, joinedDate, discordSince, time }) {
+function renderFrame(ctx, { member, profile, tier, levelData, stats, avatarImage, backgroundImage, badgeIcons, gameIcons, joinedDate, discordSince, time }) {
 
     // ==========================
     // Background + ambient particles
@@ -89,6 +91,24 @@ function renderFrame(ctx, { member, profile, tier, levelData, avatarImage, backg
         level: levelData.level,
         currentXP: levelData.currentXP,
         maxXP: levelData.xpNeeded,
+        tier
+    });
+
+    // ==========================
+    // Panel mini STATS — area kanan yang tadinya kosong.
+    // Data hidup: rank, saldo Shards, streak daily.
+    // ==========================
+
+    drawPanel(ctx, {
+        title: "STATS",
+        items: [
+            `Rank : #${stats.rank}`,
+            `Shards : ${stats.shards.toLocaleString()}`,
+            `Streak : ${stats.streak > 0 ? `${stats.streak} hari` : "-"}`
+        ],
+        x: LAYOUT.stats.x,
+        y: LAYOUT.stats.y,
+        width: LAYOUT.stats.width,
         tier
     });
 
@@ -187,6 +207,12 @@ async function prepareRenderData(member) {
     const profile = getProfileData(member);
     const levelData = getLevelData(member.id, member.guild.id);
 
+    const stats = {
+        rank: getRank(member.id, member.guild.id),
+        shards: getBalance(member.id, member.guild.id),
+        streak: getDailyStreak(member.id, member.guild.id)
+    };
+
     // Theme menimpa PALET tier (color/glow/soft/border) tapi label tier
     // tetap — rarity tetap jujur, warnanya saja yang custom.
     const baseTier = getTier(member);
@@ -220,7 +246,7 @@ async function prepareRenderData(member) {
         day: "numeric", month: "short", year: "numeric"
     });
 
-    return { profile, tier, levelData, avatarImage, backgroundImage, badgeIcons, gameIcons, joinedDate, discordSince };
+    return { profile, tier, levelData, stats, avatarImage, backgroundImage, badgeIcons, gameIcons, joinedDate, discordSince };
 
 }
 

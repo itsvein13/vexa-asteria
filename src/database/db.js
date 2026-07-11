@@ -74,6 +74,25 @@ db.exec(`
         active_theme TEXT NOT NULL DEFAULT 'default',
         PRIMARY KEY (user_id, guild_id)
     );
+
+    CREATE TABLE IF NOT EXISTS ticket_config (
+        guild_id TEXT PRIMARY KEY,
+        staff_role_id TEXT NOT NULL,
+        category_id TEXT NOT NULL,
+        log_channel_id TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS tickets (
+        guild_id TEXT NOT NULL,
+        number INTEGER NOT NULL,
+        user_id TEXT NOT NULL,
+        channel_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'open',
+        created_at INTEGER NOT NULL DEFAULT 0,
+        closed_at INTEGER,
+        closed_by TEXT,
+        PRIMARY KEY (guild_id, number)
+    );
 `);
 
 export default db;

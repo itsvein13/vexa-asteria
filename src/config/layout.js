@@ -16,6 +16,17 @@ const LAYOUT = {
 
     },
 
+    // Panel mini STATS di area kanan yang kosong (kanan-atas grid)
+    stats: {
+
+        x: 1132,
+
+        y: 230,
+
+        width: 420
+
+    },
+
     // Baris kategori (BADGES / ACTIVE GAMES / STATUS / ACCOUNT) —
     // full-width, sejajar, ga numpuk ke kanan atau ke bawah.
     grid: {
