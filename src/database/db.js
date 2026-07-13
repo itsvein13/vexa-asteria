@@ -82,6 +82,12 @@ db.exec(`
         log_channel_id TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS clock_channel (
+        guild_id TEXT PRIMARY KEY,
+        channel_id TEXT NOT NULL,
+        label TEXT NOT NULL DEFAULT 'Lofi Radio'
+    );
+
     CREATE TABLE IF NOT EXISTS tickets (
         guild_id TEXT NOT NULL,
         number INTEGER NOT NULL,

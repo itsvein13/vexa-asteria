@@ -1,4 +1,5 @@
 import { ActivityType } from "discord.js";
+import { startClockUpdater } from "../utils/clockChannel.js";
 
 const GUILD_ID = process.env.GUILD_ID;
 
@@ -84,6 +85,9 @@ export default {
         await updatePresence();
 
         setInterval(updatePresence, 30000);
+
+        // Voice clock channel (Lofi Radio) — update jam WIB tiap 5 menit
+        startClockUpdater(client);
 
     }
 
