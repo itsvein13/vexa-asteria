@@ -88,7 +88,7 @@ export default {
 
         await updatePresence();
 
-        setInterval(updatePresence, 30000);
+        setInterval(updatePresence, 20000);
 
         // Voice clock channel (Lofi Radio) — update jam WIB tiap 5 menit
         startClockUpdater(client);
