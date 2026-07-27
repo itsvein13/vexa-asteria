@@ -64,6 +64,10 @@ export default {
                 {
                     name: "BANG ASLE? PANTEEEEKK",
                     type: ActivityType.Watching
+                },
+                {
+                    name: "HMU For DC Bots @veinghost",
+                    type: ActivityType.Watching
                 }
 
             ];
