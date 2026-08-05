@@ -128,6 +128,27 @@ db.exec(`
         closed_by TEXT,
         PRIMARY KEY (guild_id, number)
     );
+
+    CREATE TABLE IF NOT EXISTS mod_log_config (
+        guild_id TEXT PRIMARY KEY,
+        log_channel_id TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS mod_cases (
+        guild_id TEXT NOT NULL,
+        case_number INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        moderator_id TEXT NOT NULL,
+        reason TEXT NOT NULL DEFAULT 'No reason provided',
+        duration_ms INTEGER,
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, case_number)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_mod_cases_user
+        ON mod_cases (guild_id, user_id, type, status);
 `);
 
 export default db;
