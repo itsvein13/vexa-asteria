@@ -64,10 +64,6 @@ export default {
                 {
                     name: "BANG ASLE? PANTEEEEKK",
                     type: ActivityType.Watching
-                },
-                {
-                    name: "HMU For DC Bots @veinghost",
-                    type: ActivityType.Watching
                 }
 
             ];
@@ -88,7 +84,7 @@ export default {
 
         await updatePresence();
 
-        setInterval(updatePresence, 20000);
+        setInterval(updatePresence, 30000);
 
         // Voice clock channel (Lofi Radio) — update jam WIB tiap 5 menit
         startClockUpdater(client);

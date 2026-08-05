@@ -1,15 +1,18 @@
 import { PermissionFlagsBits } from "discord.js";
-import LEVEL_ROLES from "../config/levelRoles.js";
+import { getLevelRoles } from "../database/levelRoles.js";
 
 /**
- * Reward tertinggi yang sudah dicapai di `level` tertentu.
- * Balikin null kalau belum ada yang tercapai.
+ * Reward tertinggi yang sudah dicapai di `level` tertentu, untuk
+ * guild ini. Balikin null kalau belum ada yang tercapai (atau
+ * server belum punya tangga level).
  */
-export function rewardForLevel(level) {
+export function rewardForLevel(guildId, level) {
+
+    const ladder = getLevelRoles(guildId);
 
     let current = null;
 
-    for (const reward of LEVEL_ROLES) {
+    for (const reward of ladder) {
         if (level >= reward.level) current = reward;
     }
 
@@ -20,17 +23,23 @@ export function rewardForLevel(level) {
 /**
  * Sinkronkan role reward member dengan levelnya (mode REPLACE):
  * role reward tertinggi yang dicapai diberikan, role reward lain
- * dari daftar LEVEL_ROLES dilepas.
+ * dari tangga level server ini dilepas.
  *
  * Idempotent — aman dipanggil berulang. Balikin reward yang BARU
  * diberikan (untuk announcement), atau null kalau tidak ada perubahan,
- * bot tidak punya izin, atau posisi role di atas bot.
+ * server belum punya tangga level, bot tidak punya izin, atau posisi
+ * role di atas bot.
  */
 export async function syncRoleRewards(member, level) {
 
     if (!member?.guild) return null;
 
-    const target = rewardForLevel(level);
+    const guildId = member.guild.id;
+    const ladder = getLevelRoles(guildId);
+
+    if (ladder.length === 0) return null;
+
+    const target = rewardForLevel(guildId, level);
     if (!target) return null;
 
     const me = member.guild.members.me;
@@ -56,8 +65,8 @@ export async function syncRoleRewards(member, level) {
 
     try {
 
-        // REPLACE: lepas role reward lama yang masih nempel
-        const toRemove = LEVEL_ROLES
+        // REPLACE: lepas role reward lain di tangga ini yang masih nempel
+        const toRemove = ladder
             .filter(r => r.roleId !== target.roleId && member.roles.cache.has(r.roleId))
             .map(r => r.roleId);
 

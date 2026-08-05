@@ -82,6 +82,14 @@ db.exec(`
         log_channel_id TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS level_roles (
+        guild_id TEXT NOT NULL,
+        level INTEGER NOT NULL,
+        role_id TEXT NOT NULL,
+        label TEXT NOT NULL,
+        PRIMARY KEY (guild_id, level)
+    );
+
     CREATE TABLE IF NOT EXISTS clock_channel (
         guild_id TEXT PRIMARY KEY,
         channel_id TEXT NOT NULL,

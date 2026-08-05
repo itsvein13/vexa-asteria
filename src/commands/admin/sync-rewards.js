@@ -7,7 +7,7 @@ import {
 
 import { getAllLevels } from "../../database/levels.js";
 import { rewardForLevel, syncRoleRewards } from "../../utils/roleRewards.js";
-import LEVEL_ROLES from "../../config/levelRoles.js";
+import { getLevelRoles } from "../../database/levelRoles.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 
 export default {
@@ -21,17 +21,18 @@ export default {
 
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-        if (LEVEL_ROLES.length === 0) {
+        const guild = interaction.guild;
+
+        if (getLevelRoles(guild.id).length === 0) {
             return interaction.editReply({
-                content: "⚠️ Belum ada mapping di `config/levelRoles.js`."
+                content: "⚠️ Server ini belum punya tangga level. Pakai `/level-roles-setup` atau `/level-role-add` dulu."
             });
         }
 
-        const guild = interaction.guild;
         const rows = getAllLevels(guild.id);
 
         // Cuma proses member yang levelnya sudah mencapai reward pertama
-        const eligible = rows.filter(row => rewardForLevel(row.level) !== null);
+        const eligible = rows.filter(row => rewardForLevel(guild.id, row.level) !== null);
 
         let granted = 0;
         let alreadyOk = 0;
