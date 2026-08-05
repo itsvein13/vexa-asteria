@@ -84,6 +84,27 @@ Purpose: bukti sosial buat jasa yang dijual di server (Design, Web/App Dev, Five
 
 ---
 
+# /my-orders
+
+Purpose: klien bisa lihat histori tiket mereka sendiri kapan aja — sebelumnya begitu channel tiket kehapus, gak ada cara liat lagi order lama.
+
+- `/my-orders` — tampilin 10 tiket terbaru milik pemanggil: nomor, kategori, status (terbuka + progres saat ini, atau ditutup + kapan), dan rating ⭐ yang mereka kasih kalau ada.
+- `/my-orders member:<user>` — cek histori member lain, dibatasi staff tiket aja (role staff yang sama dengan `/ticket-setup`).
+- Ephemeral — cuma pemanggil yang lihat.
+
+---
+
+# /stats (diperluas)
+
+Section **🎫 Tickets** ditambahin ke `/stats` yang udah ada (Administrator), biar semua statistik server ada di satu tempat:
+
+- Total tiket & yang masih terbuka.
+- Breakdown per kategori (Design/Dev/Cinematic/Complain/General).
+- Top 5 staff berdasarkan jumlah tiket yang ditutup.
+- Rata-rata rating testimonial + total review.
+
+---
+
 # AutoMod: Cross-Post Spam Detection
 
 Purpose: nangkep pola self-bot/akun ke-compromise yang nyepam giveaway palsu (foto Elon Musk, MrBeast, dsb) ke banyak channel sekaligus.

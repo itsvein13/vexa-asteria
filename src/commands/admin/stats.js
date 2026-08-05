@@ -7,6 +7,7 @@ import {
 
 import { getServerStats } from "../../database/stats.js";
 import { getShopItem } from "../../config/shopItems.js";
+import { getTicketCategory } from "../../config/ticketCategories.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 
 export default {
@@ -28,6 +29,22 @@ export default {
             })
             : ["Belum ada pembelian."];
 
+        const categoryLines = s.tickets.byCategory.length
+            ? s.tickets.byCategory.map(row => {
+                const cat = getTicketCategory(row.category);
+                const name = cat ? `${cat.emoji} ${cat.label}` : row.category;
+                return `${name} — **${row.count}**`;
+            })
+            : ["Belum ada tiket."];
+
+        const staffLines = s.tickets.topStaff.length
+            ? s.tickets.topStaff.map((row, i) => `${i + 1}. <@${row.closed_by}> — **${row.closed}** ditutup`)
+            : ["Belum ada tiket yang ditutup."];
+
+        const testimonialLine = s.tickets.testimonials.total
+            ? `⭐ **${s.tickets.testimonials.avgRating}** / 5 rata-rata (dari **${s.tickets.testimonials.total}** review)`
+            : "Belum ada review masuk.";
+
         const embed = new EmbedBuilder()
             .setColor(EMBED_COLOR)
             .setTitle("📊 Vexa Stats")
@@ -48,7 +65,17 @@ export default {
                 `Pemegang saldo: **${s.holders}** • saldo tertinggi: **${s.richest.toLocaleString()}**`,
                 "",
                 "**🛒 Shop**",
-                ...salesLines
+                ...salesLines,
+                "",
+                "**🎫 Tickets**",
+                `Total: **${s.tickets.total}** • Masih terbuka: **${s.tickets.open}**`,
+                ...categoryLines,
+                "",
+                "**🏆 Top Staff (tiket ditutup)**",
+                ...staffLines,
+                "",
+                "**⭐ Testimonials**",
+                testimonialLine
 
             ].join("\n"))
             .setFooter(EMBED_FOOTER)

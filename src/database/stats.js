@@ -1,6 +1,7 @@
 import db from "./db.js";
 import { computeLevel } from "./levels.js";
 import { wibDayKey } from "./daily.js";
+import { getTestimonialSummary } from "./testimonials.js";
 
 const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -40,6 +41,25 @@ const salesStats = db.prepare(`
     GROUP BY item_id ORDER BY sold DESC
 `);
 
+const ticketTotals = db.prepare(`
+    SELECT COUNT(*) AS total,
+           COALESCE(SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END), 0) AS open
+    FROM tickets WHERE guild_id = ?
+`);
+
+const ticketsByCategory = db.prepare(`
+    SELECT category, COUNT(*) AS count
+    FROM tickets WHERE guild_id = ? AND category IS NOT NULL
+    GROUP BY category ORDER BY count DESC
+`);
+
+const topStaffByClosed = db.prepare(`
+    SELECT closed_by, COUNT(*) AS closed
+    FROM tickets
+    WHERE guild_id = ? AND status = 'closed' AND closed_by IS NOT NULL
+    GROUP BY closed_by ORDER BY closed DESC LIMIT 5
+`);
+
 /**
  * Snapshot statistik server untuk /stats.
  * Semua angka dihitung on-demand — dataset komunitas masih kecil,
@@ -70,7 +90,14 @@ export function getServerStats(guildId, now = Date.now()) {
         richest: eco.richest,
         holders: eco.holders,
 
-        sales: salesStats.all(guildId)
+        sales: salesStats.all(guildId),
+
+        tickets: {
+            ...ticketTotals.get(guildId),
+            byCategory: ticketsByCategory.all(guildId),
+            topStaff: topStaffByClosed.all(guildId),
+            testimonials: getTestimonialSummary(guildId)
+        }
 
     };
 

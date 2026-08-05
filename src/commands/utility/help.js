@@ -50,6 +50,7 @@ const CONTENT = {
                 lines: [
                     "Buka tiket lewat tombol **Open Ticket** di channel ticket — pilih kategori (Design, Dev, Cinematic, Complain, General)",
                     "Tiket jasa (Design/Dev/Cinematic) yang selesai bakal di-DM minta rating ⭐ — hasilnya masuk channel testimonial",
+                    "`/my-orders` — lihat histori tiket kamu sendiri (kategori, status, rating yang kamu kasih)",
                     "`/suggest` — kasih ide buat server, komunitas bisa vote 👍👎",
                     "`/invites` `/invites-leaderboard` — cek/lihat siapa paling banyak ngundang member"
                 ]
@@ -124,6 +125,7 @@ const CONTENT = {
                 lines: [
                     "Open a ticket via the **Open Ticket** button in the ticket channel — pick a category (Design, Dev, Cinematic, Complain, General)",
                     "Finished service tickets (Design/Dev/Cinematic) get a DM asking for a ⭐ rating — results go to the testimonial channel",
+                    "`/my-orders` — view your own ticket history (category, status, the rating you gave)",
                     "`/suggest` — share an idea for the server, the community can vote 👍👎",
                     "`/invites` `/invites-leaderboard` — check/see who's invited the most members"
                 ]

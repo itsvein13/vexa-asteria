@@ -67,6 +67,15 @@ const setOrderStatusStmt = db.prepare(`
     WHERE guild_id = @guildId AND channel_id = @channelId AND status = 'open'
 `);
 
+const byUserStmt = db.prepare(`
+    SELECT t.number, t.category, t.order_status, t.status, t.created_at, t.closed_at, tm.rating
+    FROM tickets t
+    LEFT JOIN testimonials tm ON tm.guild_id = t.guild_id AND tm.ticket_number = t.number
+    WHERE t.guild_id = ? AND t.user_id = ?
+    ORDER BY t.created_at DESC
+    LIMIT ?
+`);
+
 /**
  * Buat tiket baru (transaksi: nomor urut + insert atomik).
  * category = id dari config/ticketCategories.js (boleh null buat
@@ -124,6 +133,25 @@ export function getTicketByNumber(guildId, number) {
  */
 export function setOrderStatus(guildId, channelId, orderStatus) {
     return setOrderStatusStmt.run({ guildId, channelId, orderStatus }).changes > 0;
+}
+
+/**
+ * Histori tiket (open + closed) milik satu member, terbaru duluan.
+ * Ikut nyelipin rating testimonial (kalau ada) lewat LEFT JOIN — jadi
+ * ga perlu query kedua. Dipakai /my-orders.
+ */
+export function getTicketsByUser(guildId, userId, limit = 10) {
+
+    return byUserStmt.all(guildId, userId, limit).map(row => ({
+        number: row.number,
+        category: row.category,
+        orderStatus: row.order_status,
+        status: row.status,
+        createdAt: row.created_at,
+        closedAt: row.closed_at,
+        rating: row.rating
+    }));
+
 }
 
 function mapTicketRow(row) {
