@@ -149,6 +149,37 @@ db.exec(`
 
     CREATE INDEX IF NOT EXISTS idx_mod_cases_user
         ON mod_cases (guild_id, user_id, type, status);
+
+    CREATE TABLE IF NOT EXISTS suggestion_config (
+        guild_id TEXT PRIMARY KEY,
+        channel_id TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS suggestions (
+        guild_id TEXT NOT NULL,
+        number INTEGER NOT NULL,
+        user_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        message_id TEXT,
+        status TEXT NOT NULL DEFAULT 'pending',
+        reviewed_by TEXT,
+        reviewed_at INTEGER,
+        created_at INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, number)
+    );
+
+    CREATE TABLE IF NOT EXISTS invite_uses (
+        guild_id TEXT NOT NULL,
+        invited_user_id TEXT NOT NULL,
+        inviter_id TEXT,
+        invite_code TEXT,
+        joined_at INTEGER NOT NULL DEFAULT 0,
+        left_at INTEGER,
+        PRIMARY KEY (guild_id, invited_user_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_invite_uses_inviter
+        ON invite_uses (guild_id, inviter_id, left_at);
 `);
 
 export default db;

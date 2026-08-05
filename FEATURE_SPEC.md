@@ -80,3 +80,29 @@ Guard bawaan tiap aksi (fungsi `canModerate` di `utils/modLog.js`):
 - Role **Vexa** juga harus lebih tinggi dari role target di Server Settings → Roles — dicek duluan biar errornya jelas, bukan error mentah dari Discord API.
 
 Database: tabel `mod_cases` (satu baris per aksi, nomor case unik per guild, kolom `status` buat soft-delete warning) dan `mod_log_config` (channel laporan per guild).
+
+---
+
+# Suggestion Box
+
+Purpose: jalur resmi buat member kasih masukan ke server, dengan alur triase yang jelas buat staff (bukan sekadar numpuk di satu channel).
+
+- `/suggestion-setup channel:<channel>` (Administrator) — atur channel tujuan.
+- `/suggest idea:<text>` — semua member bisa pakai (ga ada batasan permission). Setiap suggestion dapat nomor urut per-server (`#1`, `#2`, ...) dan diposting sebagai embed ke channel yang dikonfigurasi.
+- Voting komunitas: bot otomatis kasih reaksi 👍👎 di pesannya — vote count kelihatan langsung dari reaksinya, ga perlu command tambahan.
+- Alur status: **pending → approved/rejected**, lalu **approved → implemented**. Staff (izin **Manage Messages**) klik tombol Approve/Reject di pesan; kalau Approved, tombol berubah jadi "Mark Implemented" buat ditandai belakangan. Reject/Implemented = status akhir, tombol dilepas.
+- Setiap transisi status di-guard atomik di database (anti dobel-klik dua staff) dan pengusul dapat DM best-effort soal keputusannya.
+- Database: `suggestions` (satu baris per suggestion, nomor + status + siapa yang review) dan `suggestion_config` (channel per guild).
+
+---
+
+# Invite Tracker
+
+Purpose: tau siapa invite siapa, buat lihat/reward member yang paling bantu growth server. Otomatis jalan begitu bot online — ga perlu command setup.
+
+- `/invites member:<user>` — invite aktif, total pernah join, dan yang sudah keluar lagi milik satu member (default: diri sendiri).
+- `/invites-leaderboard` — top 10 inviter berdasarkan invite **aktif**.
+- "Aktif" = member yang join lewat invite orang itu dan **masih ada di server**. Kalau yang diundang keluar lagi, invite itu ga lagi dihitung buat si inviter — mencegah kredit dari akun alt yang invite-lalu-leave. Kalau dia join lagi (lewat invite manapun), kreditnya otomatis pindah ke inviter yang baru.
+- Cara kerja: bot cache snapshot semua invite guild (uses count) waktu online, lalu di-diff tiap ada member baru join buat tau invite mana yang barusan kepake. Termasuk nangani kasus invite sekali-pakai yang otomatis kehapus Discord pas dipakai, dan invite dari Vanity URL (kalau guild punya fiturnya).
+- **Butuh izin bot Manage Server** — tanpa itu, bot tetap tracking join/leave tapi ga bisa identifikasi siapa inviter-nya (invite tercatat dengan inviter kosong).
+- Database: `invite_uses` (satu baris per member yang pernah join, di-upsert kalau keluar-masuk lagi).

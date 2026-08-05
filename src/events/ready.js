@@ -1,5 +1,6 @@
 import { ActivityType } from "discord.js";
 import { startClockUpdater } from "../utils/clockChannel.js";
+import { cacheGuildInvites } from "../utils/inviteCache.js";
 
 const GUILD_ID = process.env.GUILD_ID;
 
@@ -88,6 +89,12 @@ export default {
 
         // Voice clock channel (Lofi Radio) — update jam WIB tiap 5 menit
         startClockUpdater(client);
+
+        // Invite tracker: populate cache snapshot tiap guild biar
+        // guildMemberAdd bisa diff & tau siapa yang invite siapa.
+        for (const g of client.guilds.cache.values()) {
+            await cacheGuildInvites(g);
+        }
 
     }
 
