@@ -54,13 +54,28 @@ export default {
         const embed = new EmbedBuilder()
             .setColor(EMBED_COLOR)
             .setTitle("🎫 Support Ticket")
-            .setDescription([
-                "Butuh bantuan admin/staff secara privat?",
-                "Klik tombol di bawah — kamu akan mendapat channel privat",
-                "yang hanya bisa dilihat kamu dan tim staff.",
-                "",
-                "-# Satu member hanya bisa punya satu tiket aktif."
-            ].join("\n"))
+            .addFields(
+                {
+                    name: "🇮🇩 Bahasa Indonesia",
+                    value: [
+                        "Butuh bantuan admin/staff secara privat?",
+                        "Klik tombol di bawah — kamu bakal dapet channel privat",
+                        "yang cuma bisa diliat kamu dan tim staff.",
+                        "",
+                        "-# Satu member cuma boleh punya satu tiket aktif."
+                    ].join("\n")
+                },
+                {
+                    name: "🇬🇧 English",
+                    value: [
+                        "Need private help from admin/staff?",
+                        "Click the button below — you'll get a private channel",
+                        "that only you and the staff team can see.",
+                        "",
+                        "-# One member can only have one active ticket at a time."
+                    ].join("\n")
+                }
+            )
             .setFooter(EMBED_FOOTER);
 
         const row = new ActionRowBuilder().addComponents(

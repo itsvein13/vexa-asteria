@@ -105,13 +105,28 @@ export default {
         const embed = new EmbedBuilder()
             .setColor(EMBED_COLOR)
             .setTitle(`🎫 Ticket #${String(number).padStart(4, "0")}`)
-            .setDescription([
-                `Halo ${interaction.user}! Jelaskan keperluanmu di sini.`,
-                category ? `Kategori: **${category.emoji} ${category.label}**` : "",
-                `Tim <@&${config.staffRoleId}> akan segera merespons.`,
-                "",
-                "-# Staff atau kamu bisa menutup tiket dengan tombol di bawah."
-            ].filter(Boolean).join("\n"))
+            .addFields(
+                {
+                    name: "🇮🇩 Bahasa Indonesia",
+                    value: [
+                        `Halo ${interaction.user}! Jelasin keperluan kamu di sini.`,
+                        category ? `Kategori: **${category.emoji} ${category.label}**` : "",
+                        `Tim <@&${config.staffRoleId}> bakal segera respons.`,
+                        "",
+                        "-# Staff atau kamu bisa nutup tiket pakai tombol di bawah."
+                    ].filter(Boolean).join("\n")
+                },
+                {
+                    name: "🇬🇧 English",
+                    value: [
+                        `Hey ${interaction.user}! Explain what you need here.`,
+                        category ? `Category: **${category.emoji} ${category.label}**` : "",
+                        `The <@&${config.staffRoleId}> team will respond shortly.`,
+                        "",
+                        "-# Staff or you can close this ticket using the button below."
+                    ].filter(Boolean).join("\n")
+                }
+            )
             .setFooter(EMBED_FOOTER);
 
         const row = new ActionRowBuilder().addComponents(

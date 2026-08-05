@@ -48,7 +48,10 @@ export default {
         );
 
         await interaction.reply({
-            content: "🎫 Sebelum tiket dibuat, pilih dulu kategori yang paling sesuai sama kebutuhan kamu:",
+            content: [
+                "🇮🇩 🎫 Sebelum tiket dibuat, pilih dulu kategori yang paling sesuai sama kebutuhan kamu:",
+                "🇬🇧 🎫 Before your ticket is created, pick the category that fits your need best:"
+            ].join("\n"),
             components: [row],
             flags: MessageFlags.Ephemeral
         });
