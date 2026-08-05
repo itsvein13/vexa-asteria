@@ -106,3 +106,17 @@ Purpose: tau siapa invite siapa, buat lihat/reward member yang paling bantu grow
 - Cara kerja: bot cache snapshot semua invite guild (uses count) waktu online, lalu di-diff tiap ada member baru join buat tau invite mana yang barusan kepake. Termasuk nangani kasus invite sekali-pakai yang otomatis kehapus Discord pas dipakai, dan invite dari Vanity URL (kalau guild punya fiturnya).
 - **Butuh izin bot Manage Server** — tanpa itu, bot tetap tracking join/leave tapi ga bisa identifikasi siapa inviter-nya (invite tercatat dengan inviter kosong).
 - Database: `invite_uses` (satu baris per member yang pernah join, di-upsert kalau keluar-masuk lagi).
+
+---
+
+# Anti-Raid Protection
+
+Purpose: deteksi lonjakan join massal (bot raid) dan otomatis kick akun-akun mencurigakan sebelum sempat spam/scam channel. Melengkapi AutoMod (yang fokus ke pola pesan) dari sisi join-gate. Ga perlu command setup terpisah — otomatis aktif begitu bot online, dan laporannya dikirim ke channel yang sama dengan AutoMod (`/automod-setup`).
+
+- Threshold: **10 member join dalam 30 detik** (preset Conservative — dipilih biar server yang emang kadang rame joinnya, misal abis event/promo, ga kena salah deteksi).
+- Begitu ke-trigger, Vexa masuk **mode waspada selama 5 menit** — bukan cuma gelombang awal yang dicek, tiap member baru yang join selama periode itu juga otomatis dievaluasi tanpa perlu threshold ke-hit ulang.
+- Aksi: member (baik dari gelombang awal maupun yang join selama mode waspada) dengan **akun Discord di bawah 7 hari** otomatis **di-kick** — pola khas bot raid yang akunnya baru dibikin sesaat sebelum dipakai. Member dengan akun lebih tua dibiarkan, cuma dicatat di laporan (gelombang awal) tanpa tindakan.
+- Setiap trigger mengirim laporan lengkap ke mod-log: daftar member, umur akun masing-masing, dan berapa yang di-kick. Auto-kick individual selama mode waspada juga dilog ringkas.
+- `/raid-status` (izin **Kick Members**) — cek apakah mode waspada sedang aktif dan sisa waktunya.
+- `/raid-clear` (izin **Kick Members**) — safety valve: matikan mode waspada manual kalau ternyata false positive (misal emang lagi ada growth spurt asli), biar member baru berhenti ke-auto-kick.
+- Trade-off yang perlu disadari: auto-kick berdasarkan umur akun **bisa salah kena** member baru asli yang kebetulan join bareng waktu gelombang itu. Ini pilihan sadar (bukan default paling aman) — kalau mau nol risiko, `/raid-clear` selalu tersedia buat stop secepatnya, dan ke depannya threshold/aksi bisa diubah lagi kalau perlu.
