@@ -58,6 +58,32 @@ Purpose: channel privat 1-on-1 antara member dan staff, dengan kategori kebutuha
 
 ---
 
+# Ticket Order Status
+
+Purpose: staff bisa nandain progres pengerjaan tiket jasa tanpa harus ngetik manual tiap kali klien nanya "udah sampe mana".
+
+- `/ticket-status status:<pilihan>` — dijalankan **di dalam channel tiket** yang masih aktif, staff-only (role staff yang sama kayak `/ticket-setup`, bukan permission Discord — jadi ga muncul di command picker Administrator, cek-nya di runtime).
+- Pilihan status: 🔧 **In Progress**, 💰 **Awaiting Payment**, ✅ **Completed**, atau ↩️ **Reset** (balikin ke belum diproses).
+- Begitu diset: topic channel otomatis keupdate (`🔧 In Progress — Ticket #0007`) dan ada pesan konfirmasi di channel. Update topic sengaja pakai `setTopic`, **bukan** rename nama channel (`setName`) — rename channel kena rate limit ketat Discord (2x/10 menit), sama masalah yang pernah ditemui di fitur Lofi Radio clock.
+- Status terakhir tiket ikut tercatat di log waktu tiket ditutup (`/ticket-close`), jadi ada jejak progres di histori.
+- Terpisah dari status buka/tutup tiket (kolom database beda: `order_status` vs `status`) — reset atau ganti status jasa ga akan bikin tiket keanggep tertutup atau kebuka lagi.
+- Database: kolom `order_status` di tabel `tickets` (auto-migrasi buat instalasi lama, sama pola kayak migrasi `category`).
+
+---
+
+# Client Testimonials
+
+Purpose: bukti sosial buat jasa yang dijual di server (Design, Web/App Dev, FiveM/NFS Cinematic) — calon klien baru bisa liat review asli sebelum order.
+
+- `/testimonial-setup channel:<channel>` (Administrator) — atur channel tujuan review.
+- Begitu tiket dari kategori **jasa berbayar** (Design, Programming, Cinematic — bukan Complain/General, karena aneh minta bintang 5 abis komplain) ditutup, Vexa otomatis DM pembuat tiket: "Gimana pengalaman kamu?" dengan 5 tombol rating (⭐ sampai ⭐⭐⭐⭐⭐).
+- Klik salah satu rating → muncul modal buat testimoni tertulis (opsional, maks 500 karakter) → begitu submit, review diposting sebagai embed ke channel testimonial (rating bintang, komentar, kategori jasa, nomor tiket, avatar+nama pengulas).
+- Satu tiket cuma bisa direview sekali (guard di database, submit kedua otomatis ditolak) — dan tiket kategori Complain/General ga pernah dapat DM permintaan review sama sekali.
+- DM adalah best-effort — kalau DM klien tertutup, itu tercatat di log penutupan tiket (`⚠️ DM permintaan review gagal terkirim`) biar staff tau perlu follow-up manual kalau mau.
+- Database: tabel `testimonials` (satu baris per tiket, guard anti-dobel-submit) dan `testimonial_config` (channel per guild).
+
+---
+
 # AutoMod: Cross-Post Spam Detection
 
 Purpose: nangkep pola self-bot/akun ke-compromise yang nyepam giveaway palsu (foto Elon Musk, MrBeast, dsb) ke banyak channel sekaligus.

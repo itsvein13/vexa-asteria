@@ -1,6 +1,9 @@
 import {
     EmbedBuilder,
     AttachmentBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     MessageFlags
 } from "discord.js";
 
@@ -10,7 +13,9 @@ import {
     closeTicket
 } from "../../database/tickets.js";
 
+import { hasTestimonial } from "../../database/testimonials.js";
 import { getTicketCategory } from "../../config/ticketCategories.js";
+import { getOrderStatus } from "../../config/ticketOrderStatuses.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 import safeSend from "../../utils/safeSend.js";
 
@@ -100,6 +105,16 @@ export default {
 
         closeTicket(guild.id, interaction.channel.id, interaction.user.id);
 
+        const category = ticket.category ? getTicketCategory(ticket.category) : null;
+
+        // Kategori jasa berbayar (Design/Dev/Cinematic) → minta review.
+        // Best-effort: banyak orang nutup DM dari server, gagal itu wajar.
+        let reviewDmSent = null; // null = ga relevan (bukan kategori reviewable)
+
+        if (category?.reviewable && !hasTestimonial(guild.id, ticket.number)) {
+            reviewDmSent = await sendReviewRequest(interaction.client, ticket, category, guild);
+        }
+
         // Kirim ke channel log
         const logChannel = config
             ? guild.channels.cache.get(config.logChannelId)
@@ -107,7 +122,7 @@ export default {
 
         if (logChannel) {
 
-            const category = ticket.category ? getTicketCategory(ticket.category) : null;
+            const finalStatus = ticket.orderStatus ? getOrderStatus(ticket.orderStatus) : null;
 
             const embed = new EmbedBuilder()
                 .setColor(EMBED_COLOR)
@@ -115,8 +130,11 @@ export default {
                 .setDescription([
                     `Pembuat: <@${ticket.userId}>`,
                     category ? `Kategori: **${category.emoji} ${category.label}**` : "",
+                    finalStatus ? `Status terakhir: **${finalStatus.emoji} ${finalStatus.label}**` : "",
                     `Ditutup oleh: ${interaction.user}`,
-                    `Dibuka: <t:${Math.floor(ticket.createdAt / 1000)}:f>`
+                    `Dibuka: <t:${Math.floor(ticket.createdAt / 1000)}:f>`,
+                    reviewDmSent === true ? "-# ⭐ DM permintaan review terkirim ke pembuat tiket." : "",
+                    reviewDmSent === false ? "-# ⚠️ DM permintaan review gagal terkirim (DM tertutup)." : ""
                 ].filter(Boolean).join("\n"))
                 .setFooter(EMBED_FOOTER)
                 .setTimestamp();
@@ -140,3 +158,47 @@ export default {
     }
 
 };
+
+/**
+ * DM pembuat tiket minta rating ⭐ 1-5 lewat tombol. Klik salah satu
+ * bakal munculin modal buat testimoni tertulis (opsional) — lihat
+ * interactions/buttons/testimonial-rate.js. Balikin true/false
+ * (berhasil terkirim atau tidak), best-effort.
+ */
+async function sendReviewRequest(client, ticket, category, guild) {
+
+    const user = await client.users.fetch(ticket.userId).catch(() => null);
+    if (!user) return false;
+
+    const embed = new EmbedBuilder()
+        .setColor(EMBED_COLOR)
+        .setTitle("⭐ Gimana pengalaman kamu?")
+        .addFields(
+            {
+                name: "🇮🇩 Bahasa Indonesia",
+                value: `Makasih udah pakai jasa **${category.emoji} ${category.label}** di **${guild.name}**! Kasih rating yuk, cuma butuh beberapa detik.`
+            },
+            {
+                name: "🇬🇧 English",
+                value: `Thanks for using our **${category.emoji} ${category.label}** service at **${guild.name}**! Mind leaving a quick rating?`
+            }
+        )
+        .setFooter(EMBED_FOOTER);
+
+    const row = new ActionRowBuilder().addComponents(
+        [1, 2, 3, 4, 5].map(n =>
+            new ButtonBuilder()
+                .setCustomId(`testimonial-rate:${guild.id}:${ticket.number}:${n}`)
+                .setLabel("⭐".repeat(n))
+                .setStyle(ButtonStyle.Secondary)
+        )
+    );
+
+    try {
+        await user.send({ embeds: [embed], components: [row] });
+        return true;
+    } catch {
+        return false;
+    }
+
+}

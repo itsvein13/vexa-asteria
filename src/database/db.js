@@ -123,6 +123,7 @@ db.exec(`
         user_id TEXT NOT NULL,
         channel_id TEXT NOT NULL,
         category TEXT,
+        order_status TEXT,
         status TEXT NOT NULL DEFAULT 'open',
         created_at INTEGER NOT NULL DEFAULT 0,
         closed_at INTEGER,
@@ -181,6 +182,22 @@ db.exec(`
 
     CREATE INDEX IF NOT EXISTS idx_invite_uses_inviter
         ON invite_uses (guild_id, inviter_id, left_at);
+
+    CREATE TABLE IF NOT EXISTS testimonial_config (
+        guild_id TEXT PRIMARY KEY,
+        channel_id TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS testimonials (
+        guild_id TEXT NOT NULL,
+        ticket_number INTEGER NOT NULL,
+        user_id TEXT NOT NULL,
+        category TEXT,
+        rating INTEGER NOT NULL,
+        content TEXT,
+        created_at INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, ticket_number)
+    );
 `);
 
 // Migrasi kolom: instalasi lama sudah punya tabel `tickets` dari sebelum
@@ -192,6 +209,11 @@ const ticketColumns = db.prepare("PRAGMA table_info(tickets)").all().map(c => c.
 if (!ticketColumns.includes("category")) {
     db.exec("ALTER TABLE tickets ADD COLUMN category TEXT");
     console.log("📦 Migrasi: kolom 'category' ditambahkan ke tabel tickets");
+}
+
+if (!ticketColumns.includes("order_status")) {
+    db.exec("ALTER TABLE tickets ADD COLUMN order_status TEXT");
+    console.log("📦 Migrasi: kolom 'order_status' ditambahkan ke tabel tickets");
 }
 
 export default db;

@@ -48,12 +48,22 @@ const openByUserStmt = db.prepare(`
 `);
 
 const byChannelStmt = db.prepare(`
-    SELECT number, user_id, category, created_at FROM tickets
+    SELECT number, user_id, category, order_status, created_at FROM tickets
     WHERE guild_id = ? AND channel_id = ? AND status = 'open'
+`);
+
+const byNumberStmt = db.prepare(`
+    SELECT number, user_id, category, order_status, created_at FROM tickets
+    WHERE guild_id = ? AND number = ?
 `);
 
 const closeStmt = db.prepare(`
     UPDATE tickets SET status = 'closed', closed_at = @closedAt, closed_by = @closedBy
+    WHERE guild_id = @guildId AND channel_id = @channelId AND status = 'open'
+`);
+
+const setOrderStatusStmt = db.prepare(`
+    UPDATE tickets SET order_status = @orderStatus
     WHERE guild_id = @guildId AND channel_id = @channelId AND status = 'open'
 `);
 
@@ -88,12 +98,40 @@ export function getOpenTicket(guildId, userId) {
 /** Data tiket open berdasarkan channel-nya (null kalau bukan channel tiket). */
 export function getTicketByChannel(guildId, channelId) {
     const row = byChannelStmt.get(guildId, channelId);
-    return row
-        ? { number: row.number, userId: row.user_id, category: row.category, createdAt: row.created_at }
-        : null;
+    return row ? mapTicketRow(row) : null;
 }
 
 /** Tandai tiket closed. Balikin true kalau ada yang ter-update. */
 export function closeTicket(guildId, channelId, closedBy) {
     return closeStmt.run({ guildId, channelId, closedBy, closedAt: Date.now() }).changes > 0;
+}
+
+/**
+ * Data tiket berdasarkan nomor urutnya — beda dari getTicketByChannel,
+ * ini ga syarat status 'open' dan ga butuh channel-nya masih ada.
+ * Dipakai testimonial system karena channel tiket udah kehapus
+ * waktu member ngisi review-nya.
+ */
+export function getTicketByNumber(guildId, number) {
+    const row = byNumberStmt.get(guildId, number);
+    return row ? mapTicketRow(row) : null;
+}
+
+/**
+ * Update status progres (bukan status buka/tutup) tiket ini — dipakai
+ * /ticket-status. Cuma bisa dipakai selagi tiketnya masih open. Kirim
+ * orderStatus = null buat reset. Balikin true kalau ada yang ke-update.
+ */
+export function setOrderStatus(guildId, channelId, orderStatus) {
+    return setOrderStatusStmt.run({ guildId, channelId, orderStatus }).changes > 0;
+}
+
+function mapTicketRow(row) {
+    return {
+        number: row.number,
+        userId: row.user_id,
+        category: row.category,
+        orderStatus: row.order_status,
+        createdAt: row.created_at
+    };
 }

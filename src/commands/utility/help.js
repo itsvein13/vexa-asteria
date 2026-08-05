@@ -9,7 +9,9 @@ import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 
 // ==========================
 // Konten per bahasa — nambah command baru cukup tambah baris
-// di kedua bahasa.
+// di kedua bahasa. `sections` selalu kelihatan, `staff` cuma buat yang
+// punya izin moderasi (Moderate/Kick/Ban Members), `admin` cuma buat
+// Administrator.
 // ==========================
 
 const CONTENT = {
@@ -42,15 +44,48 @@ const CONTENT = {
                     "Naik level dari aktif chat (level × 10 💎)",
                     "Event & giveaway dari admin"
                 ]
+            },
+            {
+                title: "🎫 Butuh Bantuan / Jasa?",
+                lines: [
+                    "Buka tiket lewat tombol **Open Ticket** di channel ticket — pilih kategori (Design, Dev, Cinematic, Complain, General)",
+                    "Tiket jasa (Design/Dev/Cinematic) yang selesai bakal di-DM minta rating ⭐ — hasilnya masuk channel testimonial",
+                    "`/suggest` — kasih ide buat server, komunitas bisa vote 👍👎",
+                    "`/invites` `/invites-leaderboard` — cek/lihat siapa paling banyak ngundang member"
+                ]
             }
         ],
-        admin: {
-            title: "🛠️ Admin",
+        staff: {
+            title: "🛡️ Staff (izin moderasi)",
             lines: [
-                "`/verify-setup` `/roles-setup` `/faq-setup` — panel server",
+                "`/warn` `/warnings` `/warning-remove` — kasih/lihat/hapus warning",
+                "`/mute` `/unmute` — timeout member (maks 28 hari)",
+                "`/kick` `/ban` `/unban` — aksi moderasi standar",
+                "`/case` — lihat detail satu case moderasi by nomor",
+                "`/raid-status` `/raid-clear` — cek/matiin mode waspada Anti-Raid",
+                "`/ticket-status` — update progres tiket (In Progress/Awaiting Payment/Completed), jalanin di dalam channel tiket"
+            ]
+        },
+        admin: {
+            title: "🛠️ Admin — Setup Server",
+            lines: [
+                "`/verify-setup` `/roles-setup` `/faq-setup` `/rules-setup` — panel server",
+                "`/ticket-setup` — panel ticket + role staff, kategori channel, log",
+                "`/suggestion-setup` — channel tujuan `/suggest`",
+                "`/testimonial-setup` — channel tujuan review klien",
+                "`/automod-setup` `/modlog-setup` — channel laporan AutoMod & mod-log",
+                "`/creator-review-setup` — channel review aplikasi content creator",
+                "`/lofi-setup` — voice channel jam Lofi Radio (WIB)",
+                "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — role reward per level"
+            ]
+        },
+        adminTools: {
+            title: "🛠️ Admin — Tools",
+            lines: [
                 "`/sync-rewards` — apply role reward level ke semua member",
                 "`/give-shards` — beri/kurangi Shards member",
-                "`/remove-initiate` — lepas role Initiate massal"
+                "`/remove-initiate` — lepas role Initiate massal",
+                "`/stats` — statistik aktivitas & economy server"
             ]
         }
     },
@@ -83,15 +118,48 @@ const CONTENT = {
                     "Level up by chatting (level × 10 💎)",
                     "Admin events & giveaways"
                 ]
+            },
+            {
+                title: "🎫 Need Help / Services?",
+                lines: [
+                    "Open a ticket via the **Open Ticket** button in the ticket channel — pick a category (Design, Dev, Cinematic, Complain, General)",
+                    "Finished service tickets (Design/Dev/Cinematic) get a DM asking for a ⭐ rating — results go to the testimonial channel",
+                    "`/suggest` — share an idea for the server, the community can vote 👍👎",
+                    "`/invites` `/invites-leaderboard` — check/see who's invited the most members"
+                ]
             }
         ],
-        admin: {
-            title: "🛠️ Admin",
+        staff: {
+            title: "🛡️ Staff (moderation permissions)",
             lines: [
-                "`/verify-setup` `/roles-setup` `/faq-setup` — server panels",
+                "`/warn` `/warnings` `/warning-remove` — issue/view/revoke warnings",
+                "`/mute` `/unmute` — timeout a member (max 28 days)",
+                "`/kick` `/ban` `/unban` — standard moderation actions",
+                "`/case` — look up one moderation case by number",
+                "`/raid-status` `/raid-clear` — check/end Anti-Raid alert mode",
+                "`/ticket-status` — update order progress (In Progress/Awaiting Payment/Completed), run inside a ticket channel"
+            ]
+        },
+        admin: {
+            title: "🛠️ Admin — Server Setup",
+            lines: [
+                "`/verify-setup` `/roles-setup` `/faq-setup` `/rules-setup` — server panels",
+                "`/ticket-setup` — ticket panel + staff role, channel category, log",
+                "`/suggestion-setup` — destination channel for `/suggest`",
+                "`/testimonial-setup` — destination channel for client reviews",
+                "`/automod-setup` `/modlog-setup` — AutoMod & mod-log report channels",
+                "`/creator-review-setup` — content creator application review channel",
+                "`/lofi-setup` — Lofi Radio voice channel clock (WIB)",
+                "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — per-level role rewards"
+            ]
+        },
+        adminTools: {
+            title: "🛠️ Admin — Tools",
+            lines: [
                 "`/sync-rewards` — apply level role rewards to all members",
                 "`/give-shards` — give/deduct a member's Shards",
-                "`/remove-initiate` — bulk-remove the Initiate role"
+                "`/remove-initiate` — bulk-remove the Initiate role",
+                "`/stats` — server activity & economy statistics"
             ]
         }
     }
@@ -129,13 +197,22 @@ export default {
         const lang = resolveLanguage(interaction);
         const content = CONTENT[lang];
 
-        const isAdmin = interaction.memberPermissions?.has(
-            PermissionFlagsBits.Administrator
-        ) ?? false;
+        const perms = interaction.memberPermissions;
+        const isAdmin = perms?.has(PermissionFlagsBits.Administrator) ?? false;
 
-        const sections = isAdmin
-            ? [...content.sections, content.admin]
-            : content.sections;
+        // Staff = punya izin moderasi apa aja (bukan cuma Administrator) —
+        // Moderation Suite sengaja pakai izin granular (Moderate/Kick/Ban
+        // Members) biar role "Moderator" tanpa full admin tetap kepakai,
+        // jadi /help juga harus ngikutin logika yang sama.
+        const isStaff = isAdmin
+            || Boolean(perms?.has(PermissionFlagsBits.ModerateMembers))
+            || Boolean(perms?.has(PermissionFlagsBits.KickMembers))
+            || Boolean(perms?.has(PermissionFlagsBits.BanMembers));
+
+        const sections = [...content.sections];
+
+        if (isStaff) sections.push(content.staff);
+        if (isAdmin) sections.push(content.admin, content.adminTools);
 
         const description = sections
             .map(s => [`**${s.title}**`, ...s.lines].join("\n"))
