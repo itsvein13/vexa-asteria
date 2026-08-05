@@ -230,6 +230,12 @@ db.exec(`
         updated_at INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (guild_id, category_id)
     );
+
+    CREATE TABLE IF NOT EXISTS service_catalog_config (
+        guild_id TEXT PRIMARY KEY,
+        channel_id TEXT NOT NULL,
+        message_id TEXT
+    );
 `);
 
 // Migrasi kolom: instalasi lama sudah punya tabel `tickets` dari sebelum

@@ -6,6 +6,7 @@ import {
 
 import { setServicePrice } from "../../database/servicePricing.js";
 import { getTicketCategory } from "../../config/ticketCategories.js";
+import { refreshServiceCatalogPanel } from "../../utils/serviceCatalog.js";
 
 // Cuma kategori jasa berbayar (reviewable: true) yang masuk akal dipatok
 // harga — Complain dan General bukan jasa yang dijual.
@@ -50,6 +51,8 @@ export default {
         const note = interaction.options.getString("note");
 
         setServicePrice(interaction.guild.id, categoryId, price, note);
+
+        await refreshServiceCatalogPanel(interaction.client, interaction.guild.id);
 
         const category = getTicketCategory(categoryId);
 

@@ -6,6 +6,7 @@ import {
 
 import { removeServicePrice } from "../../database/servicePricing.js";
 import { getTicketCategory } from "../../config/ticketCategories.js";
+import { refreshServiceCatalogPanel } from "../../utils/serviceCatalog.js";
 
 const SERVICE_CHOICES = [
     { name: "🎨 Design & Video Editing", value: "design" },
@@ -33,6 +34,10 @@ export default {
         const category = getTicketCategory(categoryId);
 
         const removed = removeServicePrice(interaction.guild.id, categoryId);
+
+        if (removed) {
+            await refreshServiceCatalogPanel(interaction.client, interaction.guild.id);
+        }
 
         await interaction.reply({
             content: removed

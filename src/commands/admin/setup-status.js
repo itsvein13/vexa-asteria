@@ -13,6 +13,7 @@ import { getTestimonialChannel } from "../../database/testimonials.js";
 import { getAutomodLogChannel } from "../../database/automodConfig.js";
 import { getModLogChannel } from "../../database/modLogConfig.js";
 import { getCreatorReviewChannel } from "../../database/creatorApplications.js";
+import { getServiceCatalogConfig } from "../../database/serviceCatalogConfig.js";
 import { getClockChannel } from "../../utils/clockChannel.js";
 import { getLevelRoles } from "../../database/levelRoles.js";
 import { getMilestones } from "../../database/referralRewards.js";
@@ -42,7 +43,8 @@ export default {
         const support = [
             line(Boolean(getTicketConfig(guildId)), "Ticketing", "ticket-setup"),
             line(Boolean(getSuggestionChannel(guildId)), "Suggestion Box", "suggestion-setup"),
-            line(Boolean(getTestimonialChannel(guildId)), "Testimonials", "testimonial-setup")
+            line(Boolean(getTestimonialChannel(guildId)), "Testimonials", "testimonial-setup"),
+            line(Boolean(getServiceCatalogConfig(guildId)), "Service Catalog", "services-setup")
         ];
 
         const safety = [
