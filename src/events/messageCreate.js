@@ -5,6 +5,8 @@ import { levelUpShards } from "../config/economyRules.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../config/constants.js";
 import safeSend from "../utils/safeSend.js";
 import { syncRoleRewards } from "../utils/roleRewards.js";
+import { checkCrossPostSpam } from "../utils/antiSpam.js";
+import { handleCrossPostSpam } from "../utils/spamAction.js";
 
 export default {
 
@@ -15,6 +17,15 @@ export default {
         // Ignore bots, system messages, dan DM (cuma track di server)
         if (message.author.bot) return;
         if (!message.guild) return;
+
+        // AutoMod: cek dulu sebelum XP — pesan spam ga boleh ikut dihitung,
+        // dan begitu terdeteksi kita berhenti di sini (dihapus + ban).
+        const spamEvidence = checkCrossPostSpam(message);
+
+        if (spamEvidence) {
+            await handleCrossPostSpam(message.guild, spamEvidence);
+            return;
+        }
 
         const result = addMessageXP(message.author.id, message.guild.id);
 

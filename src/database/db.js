@@ -112,6 +112,11 @@ db.exec(`
         PRIMARY KEY (guild_id, user_id)
     );
 
+    CREATE TABLE IF NOT EXISTS automod_config (
+        guild_id TEXT PRIMARY KEY,
+        log_channel_id TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS tickets (
         guild_id TEXT NOT NULL,
         number INTEGER NOT NULL,

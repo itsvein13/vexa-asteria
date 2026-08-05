@@ -57,8 +57,8 @@ export default {
 
         const linkInput = new TextInputBuilder()
             .setCustomId("link")
-            .setLabel("Link akun content creator kamu")
-            .setPlaceholder("https://youtube.com/@kamu atau https://twitch.tv/kamu")
+            .setLabel("Kirim Link Akun Content Creator Mu")
+            .setPlaceholder("https://youtube.com/@kamu atau https://Tiktok.com/kamu")
             .setStyle(TextInputStyle.Short)
             .setRequired(true)
             .setMaxLength(300);
