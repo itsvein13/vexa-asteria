@@ -18,14 +18,16 @@ export default {
 
         const member = interaction.member;
 
-        // Hapus semua role vibe
+        // Hapus semua role vibe dulu
         await member.roles.remove(Object.values(VIBE_ROLES));
 
-        // Tambahkan role yang dipilih
-        const selected = interaction.values[0];
+        // Tambahkan yang dipilih (maksimal 2, diatur oleh setMaxValues di roles-setup.js)
+        const toAdd = interaction.values
+            .map(value => VIBE_ROLES[value])
+            .filter(Boolean);
 
-        if (VIBE_ROLES[selected]) {
-            await member.roles.add(VIBE_ROLES[selected]);
+        if (toAdd.length) {
+            await member.roles.add(toAdd);
         }
 
         await interaction.reply({

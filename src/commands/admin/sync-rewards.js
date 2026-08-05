@@ -5,8 +5,7 @@ import {
     MessageFlags
 } from "discord.js";
 
-import { getAllLevels } from "../../database/levels.js";
-import { rewardForLevel, syncRoleRewards } from "../../utils/roleRewards.js";
+import { syncAllRewards } from "../../utils/syncAllRewards.js";
 import { getLevelRoles } from "../../database/levelRoles.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 
@@ -29,38 +28,13 @@ export default {
             });
         }
 
-        const rows = getAllLevels(guild.id);
-
-        // Cuma proses member yang levelnya sudah mencapai reward pertama
-        const eligible = rows.filter(row => rewardForLevel(guild.id, row.level) !== null);
-
-        let granted = 0;
-        let alreadyOk = 0;
-        let left = 0;
-
-        for (const row of eligible) {
-
-            let member;
-
-            try {
-                member = await guild.members.fetch(row.userId);
-            } catch {
-                left++; // sudah keluar server / tidak ditemukan
-                continue;
-            }
-
-            const reward = await syncRoleRewards(member, row.level);
-
-            if (reward) granted++;
-            else alreadyOk++;
-
-        }
+        const { eligible, granted, alreadyOk, left } = await syncAllRewards(guild);
 
         const embed = new EmbedBuilder()
             .setColor(EMBED_COLOR)
             .setTitle("🔄 Sync Rewards Selesai")
             .setDescription([
-                `Member memenuhi syarat: **${eligible.length}**`,
+                `Member memenuhi syarat: **${eligible}**`,
                 `🏅 Role baru diberikan: **${granted}**`,
                 `✔️ Sudah sesuai: **${alreadyOk}**`,
                 `👋 Sudah keluar server: **${left}**`

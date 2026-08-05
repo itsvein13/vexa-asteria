@@ -32,9 +32,9 @@ export default {
 
         const games = new StringSelectMenuBuilder()
             .setCustomId("games-role-menu")
-            .setPlaceholder("🎮 Select your games")
+            .setPlaceholder("🎮 Select up to 3 games")
             .setMinValues(0)
-            .setMaxValues(10)
+            .setMaxValues(3)
             .addOptions(
                 {
                     label: "Need For Speed",
@@ -100,9 +100,9 @@ export default {
 
         const vibes = new StringSelectMenuBuilder()
             .setCustomId("vibes-role-menu")
-            .setPlaceholder("✨ Pick your vibe")
+            .setPlaceholder("✨ Pick up to 2 vibes")
             .setMinValues(1)
-            .setMaxValues(1)
+            .setMaxValues(2)
             .addOptions(
                 {
                     label: "Chill",

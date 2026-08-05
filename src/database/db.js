@@ -96,6 +96,22 @@ db.exec(`
         label TEXT NOT NULL DEFAULT 'Lofi Radio'
     );
 
+    CREATE TABLE IF NOT EXISTS creator_review_config (
+        guild_id TEXT PRIMARY KEY,
+        channel_id TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS creator_applications (
+        guild_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        link TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        submitted_at INTEGER NOT NULL DEFAULT 0,
+        reviewed_by TEXT,
+        reviewed_at INTEGER,
+        PRIMARY KEY (guild_id, user_id)
+    );
+
     CREATE TABLE IF NOT EXISTS tickets (
         guild_id TEXT NOT NULL,
         number INTEGER NOT NULL,

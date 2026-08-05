@@ -38,9 +38,18 @@ export default {
         if (interaction.isChatInputCommand()) {
             handler = client.commands.get(interaction.commandName);
         } else if (interaction.isButton()) {
-            handler = client.buttons.get(interaction.customId);
+
+            // customId bisa "namaBase" (statis) atau "namaBase:data" (dinamis,
+            // mis. "creator-approve:1234567890" untuk tombol per-user).
+            // Split aman untuk keduanya — tombol statis lama tetap cocok
+            // karena split(":")[0] pada string tanpa ":" balikin string itu sendiri.
+            const baseId = interaction.customId.split(":")[0];
+            handler = client.buttons.get(baseId);
+
         } else if (interaction.isStringSelectMenu()) {
             handler = client.selectMenus.get(interaction.customId);
+        } else if (interaction.isModalSubmit()) {
+            handler = client.modals.get(interaction.customId.split(":")[0]);
         }
 
         if (!handler) return;

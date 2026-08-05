@@ -7,6 +7,7 @@ import {
 
 import LEVEL_LADDER_PRESET from "../../config/levelLadderPreset.js";
 import { levelRoleExists, addLevelRole } from "../../database/levelRoles.js";
+import { syncAllRewards } from "../../utils/syncAllRewards.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 
 export default {
@@ -58,16 +59,20 @@ export default {
 
         }
 
+        // Auto-sync: member yang levelnya sudah cukup langsung dapat role,
+        // tanpa admin perlu ingat menjalankan /sync-rewards terpisah.
+        const { eligible, granted, alreadyOk, left } = await syncAllRewards(guild);
+
         const embed = new EmbedBuilder()
             .setColor(EMBED_COLOR)
             .setTitle("🪜 Level Roles Setup")
             .setDescription([
                 lines.join("\n"),
                 "",
-                `**${created}** dibuat, **${skipped}** dilewati.`,
+                `**${created}** role dibuat, **${skipped}** dilewati.`,
                 "",
-                "-# Jalankan `/sync-rewards` supaya member yang levelnya sudah cukup",
-                "-# langsung dapat role tanpa menunggu naik level lagi."
+                "**🔄 Auto-sync member existing**",
+                `Memenuhi syarat: **${eligible}** • 🏅 role baru: **${granted}** • ✔️ sudah sesuai: **${alreadyOk}** • 👋 sudah keluar: **${left}**`
             ].join("\n"))
             .setFooter(EMBED_FOOTER);
 
