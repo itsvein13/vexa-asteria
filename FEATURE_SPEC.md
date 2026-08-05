@@ -217,3 +217,14 @@ Plus ringkasan "X/13 selesai" di atas checklist.
 - Cara deteksi: fitur yang punya tabel config sendiri (ticket, suggestion, testimonial, automod, modlog, creator-review, lofi, level-roles, referral) dicek langsung dari tabel itu (ada baris config = ✅). Empat command yang cuma ngirim panel sekali tanpa config tersimpan (verify-setup, roles-setup, faq-setup, rules-setup) dicatat lewat tabel baru `setup_log` (upsert timestamp tiap kali command itu berhasil dijalankan) — ini satu-satunya cara buat tau command itu udah pernah jalan atau belum.
 - Database: `setup_log` (guild_id, setup_key, last_run_at), diisi dari `recordSetupRun()` di keempat command panel-only tersebut.
 - Reply selalu ephemeral, cuma admin yang manggil yang lihat.
+
+---
+
+# Service Catalog / Price List
+
+Purpose: server ini pada dasarnya bisnis jasa (Design/Video, Web/App Dev, Cinematic FiveM & NFS) — sebelum ini calon klien harus buka tiket cuma buat nanya harga, nambah beban ke channel ticket. `/services` kasih jawaban instan, ngurangin friction sebelum orang mutusin order.
+
+- `/service-price-set category:<design|programming|cinematic> price:<text> note:<text opsional>` (Administrator) — set/update harga starting satu kategori jasa. `price` bebas teks (mis. "Mulai Rp150.000", "Nego") biar ga dipaksa format angka polos.
+- `/service-price-remove category:<...>` (Administrator) — hapus harga; kategori itu balik tampil sebagai "hubungi staff" di `/services`.
+- `/services` (semua member) — katalog: tiap kategori jasa (cuma yang `reviewable: true` di `ticketCategories.js` — Design, Dev, Cinematic; Complain & General ga relevan) tampil dengan deskripsi, harga (atau fallback ajakan buka tiket kalau belum diset admin), dan catatan tambahan kalau ada. Ditutup ajakan buka tiket lewat tombol **Open Ticket**.
+- Database: `service_pricing` (guild_id, category_id, price, note, updated_at) — upsert per kategori per guild.

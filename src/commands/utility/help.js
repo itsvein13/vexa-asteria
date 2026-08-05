@@ -49,6 +49,7 @@ const CONTENT = {
             {
                 title: "🎫 Butuh Bantuan / Jasa?",
                 lines: [
+                    "`/services` — lihat katalog jasa & starting price sebelum order",
                     "Buka tiket lewat tombol **Open Ticket** di channel ticket — pilih kategori (Design, Dev, Cinematic, Complain, General)",
                     "Tiket jasa (Design/Dev/Cinematic) yang selesai bakal di-DM minta rating ⭐ — hasilnya masuk channel testimonial",
                     "`/my-orders` — lihat histori tiket kamu sendiri (kategori, status, rating yang kamu kasih)",
@@ -79,7 +80,8 @@ const CONTENT = {
                 "`/creator-review-setup` — channel review aplikasi content creator",
                 "`/lofi-setup` — voice channel jam Lofi Radio (WIB)",
                 "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — role reward per level",
-                "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — milestone Shards untuk inviter"
+                "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — milestone Shards untuk inviter",
+                "`/service-price-set` `/service-price-remove` — atur harga jasa yang tampil di `/services`"
             ]
         },
         adminTools: {
@@ -128,6 +130,7 @@ const CONTENT = {
             {
                 title: "🎫 Need Help / Services?",
                 lines: [
+                    "`/services` — browse our service catalog & starting prices before ordering",
                     "Open a ticket via the **Open Ticket** button in the ticket channel — pick a category (Design, Dev, Cinematic, Complain, General)",
                     "Finished service tickets (Design/Dev/Cinematic) get a DM asking for a ⭐ rating — results go to the testimonial channel",
                     "`/my-orders` — view your own ticket history (category, status, the rating you gave)",
@@ -158,7 +161,8 @@ const CONTENT = {
                 "`/creator-review-setup` — content creator application review channel",
                 "`/lofi-setup` — Lofi Radio voice channel clock (WIB)",
                 "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — per-level role rewards",
-                "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — Shards milestones for inviters"
+                "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — Shards milestones for inviters",
+                "`/service-price-set` `/service-price-remove` — manage the prices shown in `/services`"
             ]
         },
         adminTools: {

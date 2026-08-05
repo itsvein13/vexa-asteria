@@ -221,6 +221,15 @@ db.exec(`
         last_run_at INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (guild_id, setup_key)
     );
+
+    CREATE TABLE IF NOT EXISTS service_pricing (
+        guild_id TEXT NOT NULL,
+        category_id TEXT NOT NULL,
+        price TEXT NOT NULL,
+        note TEXT,
+        updated_at INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, category_id)
+    );
 `);
 
 // Migrasi kolom: instalasi lama sudah punya tabel `tickets` dari sebelum
