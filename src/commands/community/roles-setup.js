@@ -6,6 +6,8 @@ import {
     PermissionFlagsBits
 } from "discord.js";
 
+import { recordSetupRun } from "../../database/setupLog.js";
+
 export default {
 
     data: new SlashCommandBuilder()
@@ -176,6 +178,8 @@ export default {
             embeds: [embed],
             components: [row1, row2, row3]
         });
+
+        recordSetupRun(interaction.guild.id, "roles-setup");
 
     }
 

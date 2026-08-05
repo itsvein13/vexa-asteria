@@ -200,3 +200,20 @@ Purpose: deteksi lonjakan join massal (bot raid) dan otomatis kick akun-akun men
 - `/raid-status` (izin **Kick Members**) — cek apakah mode waspada sedang aktif dan sisa waktunya.
 - `/raid-clear` (izin **Kick Members**) — safety valve: matikan mode waspada manual kalau ternyata false positive (misal emang lagi ada growth spurt asli), biar member baru berhenti ke-auto-kick.
 - Trade-off yang perlu disadari: auto-kick berdasarkan umur akun **bisa salah kena** member baru asli yang kebetulan join bareng waktu gelombang itu. Ini pilihan sadar (bukan default paling aman) — kalau mau nol risiko, `/raid-clear` selalu tersedia buat stop secepatnya, dan ke depannya threshold/aksi bisa diubah lagi kalau perlu.
+
+---
+
+# Setup Status
+
+Purpose: dengan ~15 command `-setup` berbeda tersebar di berbagai fitur, admin (apalagi yang baru pegang server ini) gampang lupa mana yang udah dijalankan dan mana yang belum. `/setup-status` (Administrator) scan semua config di database dan kasih checklist ✅/❌ per fitur, dikelompokkan jadi 4 kategori:
+
+- **👋 Onboarding** — Verifikasi, Role Menu, FAQ, Rules (`/verify-setup` `/roles-setup` `/faq-setup` `/rules-setup`).
+- **🎫 Support & Community** — Ticketing, Suggestion Box, Testimonials (`/ticket-setup` `/suggestion-setup` `/testimonial-setup`).
+- **🛡️ Safety** — AutoMod, Moderation Log, Creator Review (`/automod-setup` `/modlog-setup` `/creator-review-setup`).
+- **✨ Extras** — Lofi Radio, Level Roles, Referral Rewards (`/lofi-setup` `/level-roles-setup` `/referral-rewards-setup`).
+
+Plus ringkasan "X/13 selesai" di atas checklist.
+
+- Cara deteksi: fitur yang punya tabel config sendiri (ticket, suggestion, testimonial, automod, modlog, creator-review, lofi, level-roles, referral) dicek langsung dari tabel itu (ada baris config = ✅). Empat command yang cuma ngirim panel sekali tanpa config tersimpan (verify-setup, roles-setup, faq-setup, rules-setup) dicatat lewat tabel baru `setup_log` (upsert timestamp tiap kali command itu berhasil dijalankan) — ini satu-satunya cara buat tau command itu udah pernah jalan atau belum.
+- Database: `setup_log` (guild_id, setup_key, last_run_at), diisi dari `recordSetupRun()` di keempat command panel-only tersebut.
+- Reply selalu ephemeral, cuma admin yang manggil yang lihat.

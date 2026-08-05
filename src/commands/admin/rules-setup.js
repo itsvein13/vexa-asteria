@@ -9,6 +9,7 @@ import {
 import { EMBED_FOOTER } from "../../config/constants.js";
 import COLORS from "../../config/colors.js";
 import safeSend from "../../utils/safeSend.js";
+import { recordSetupRun } from "../../database/setupLog.js";
 
 export default {
 
@@ -115,6 +116,10 @@ export default {
             .setFooter(EMBED_FOOTER);
 
         const sent = await safeSend(channel, { embeds: [idEmbed, enEmbed] });
+
+        if (sent) {
+            recordSetupRun(interaction.guild.id, "rules-setup");
+        }
 
         await interaction.reply({
             content: sent

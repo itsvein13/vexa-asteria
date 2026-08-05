@@ -214,6 +214,13 @@ db.exec(`
         claimed_at INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (guild_id, user_id, threshold)
     );
+
+    CREATE TABLE IF NOT EXISTS setup_log (
+        guild_id TEXT NOT NULL,
+        setup_key TEXT NOT NULL,
+        last_run_at INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, setup_key)
+    );
 `);
 
 // Migrasi kolom: instalasi lama sudah punya tabel `tickets` dari sebelum

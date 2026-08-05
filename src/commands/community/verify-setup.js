@@ -7,6 +7,8 @@ import {
     PermissionFlagsBits
 } from "discord.js";
 
+import { recordSetupRun } from "../../database/setupLog.js";
+
 export default {
 
     data: new SlashCommandBuilder()
@@ -48,6 +50,8 @@ export default {
             embeds: [embed],
             components: [row]
         });
+
+        recordSetupRun(interaction.guild.id, "verify-setup");
 
     }
 

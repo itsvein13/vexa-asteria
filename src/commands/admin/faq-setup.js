@@ -4,6 +4,8 @@ import {
     PermissionFlagsBits
 } from "discord.js";
 
+import { recordSetupRun } from "../../database/setupLog.js";
+
 export default {
 
     data: new SlashCommandBuilder()
@@ -56,6 +58,8 @@ export default {
         await interaction.reply({
             embeds: [embed]
         });
+
+        recordSetupRun(interaction.guild.id, "faq-setup");
 
     }
 

@@ -16,6 +16,15 @@ export function setClockChannel(guildId, channelId, label) {
     setStmt.run({ guildId, channelId, label });
 }
 
+const getOneStmt = db.prepare(
+    "SELECT guild_id, channel_id, label FROM clock_channel WHERE guild_id = ?"
+);
+
+/** Ambil config clock channel satu guild (buat /setup-status), null kalau belum diatur. */
+export function getClockChannel(guildId) {
+    return getOneStmt.get(guildId) ?? null;
+}
+
 /** "21:45 WIB" dari timestamp sekarang. */
 export function wibTimeLabel(now = Date.now()) {
 

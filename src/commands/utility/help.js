@@ -89,7 +89,8 @@ const CONTENT = {
                 "`/referral-sync` — cek ulang milestone referral semua inviter",
                 "`/give-shards` — beri/kurangi Shards member",
                 "`/remove-initiate` — lepas role Initiate massal",
-                "`/stats` — statistik aktivitas & economy server"
+                "`/stats` — statistik aktivitas & economy server",
+                "`/setup-status` — checklist command `-setup` mana yang udah/belum diatur"
             ]
         }
     },
@@ -167,7 +168,8 @@ const CONTENT = {
                 "`/referral-sync` — re-check every inviter against the milestone ladder",
                 "`/give-shards` — give/deduct a member's Shards",
                 "`/remove-initiate` — bulk-remove the Initiate role",
-                "`/stats` — server activity & economy statistics"
+                "`/stats` — server activity & economy statistics",
+                "`/setup-status` — checklist of which `-setup` commands are done/missing"
             ]
         }
     }
