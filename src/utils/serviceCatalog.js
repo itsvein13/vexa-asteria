@@ -22,8 +22,11 @@ export function buildServiceCatalogEmbed(guildId) {
 
         const info = prices[cat.id];
 
+        // Harga di-spoiler (||teks||) — biar orang yang scroll ga langsung
+        // liat angka, harus klik dulu. Fallback "hubungi staff" ga perlu
+        // di-spoiler, itu instruksi bukan harga.
         const priceLine = info
-            ? `💰 **${info.price}**`
+            ? `💰 ||**${info.price}**||`
             : "💰 Hubungi staff — buka tiket buat quote";
 
         const lines = [
