@@ -71,3 +71,19 @@ const leaderboardStmt = db.prepare(`
 export function getInviteLeaderboard(guildId, limit = 10) {
     return leaderboardStmt.all(guildId, limit);
 }
+
+const allInvitersStmt = db.prepare(`
+    SELECT inviter_id AS inviterId, COUNT(*) AS active
+    FROM invite_uses
+    WHERE guild_id = ? AND left_at IS NULL AND inviter_id IS NOT NULL
+    GROUP BY inviter_id
+`);
+
+/**
+ * SEMUA inviter dengan invite aktif (tanpa LIMIT) — beda dari
+ * getInviteLeaderboard yang dipotong buat tampilan. Dipakai
+ * /referral-sync buat re-cek milestone semua orang, bukan cuma top 10.
+ */
+export function getAllInviterCounts(guildId) {
+    return allInvitersStmt.all(guildId);
+}

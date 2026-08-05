@@ -198,6 +198,22 @@ db.exec(`
         created_at INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (guild_id, ticket_number)
     );
+
+    CREATE TABLE IF NOT EXISTS referral_milestones (
+        guild_id TEXT NOT NULL,
+        threshold INTEGER NOT NULL,
+        reward INTEGER NOT NULL,
+        label TEXT NOT NULL,
+        PRIMARY KEY (guild_id, threshold)
+    );
+
+    CREATE TABLE IF NOT EXISTS referral_claims (
+        guild_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        threshold INTEGER NOT NULL,
+        claimed_at INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, user_id, threshold)
+    );
 `);
 
 // Migrasi kolom: instalasi lama sudah punya tabel `tickets` dari sebelum

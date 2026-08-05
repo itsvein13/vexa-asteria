@@ -175,6 +175,20 @@ Purpose: tau siapa invite siapa, buat lihat/reward member yang paling bantu grow
 
 ---
 
+# Referral Rewards
+
+Purpose: kasih insentif konkret (Shards) buat member yang aktif ngundang orang — nyambungin Invite Tracker dan Economy yang udah ada, bukan sistem baru dari nol.
+
+- `/referral-rewards-setup` (Administrator) — bikin preset default 5 tingkat: 3/5/10/25/50 invite aktif → 300/600/1.500/4.000/10.000 💎 (Bronze → Legendary Recruiter). Angka dikalibrasi sepadan sama economy yang ada (daily ~50-85/hari, level-up level×10, theme termahal 3.000).
+- `/referral-milestone-add threshold:<n> reward:<shards> label:<text>` / `/referral-milestone-remove threshold:<n>` (Administrator) — kustomisasi tangga tanpa redeploy kode, persis pola `/level-role-add` / `/level-role-remove`.
+- `/referral-milestones` (semua member) — lihat semua tingkat + progress invite aktif sendiri ke reward berikutnya.
+- `/referral-sync` (Administrator) — cek ulang SEMUA inviter terhadap tangga saat ini, buat nangkep yang kelewat (mis. abis nambah milestone baru). Otomatis jalan juga di akhir `/referral-rewards-setup`, pola sama kayak auto-sync `/level-roles-setup`.
+- Cara kerja: begitu ada member baru join lewat invite seseorang, invite aktif orang itu dicek — kalau baru aja nembus satu/lebih milestone, Shards langsung masuk otomatis + DM notifikasi ke inviter-nya. Klaim per-member per-milestone cuma bisa sekali selamanya (guard atomik di database) — invite yang leave-lah kemudian TIDAK menarik balik reward yang sudah diberikan, cuma mencegah member itu dihitung buat milestone yang *belum* tercapai.
+- Menghapus satu milestone cuma menghentikan klaim baru — Shards yang sudah dibagikan sebelumnya tidak ditarik balik.
+- Database: `referral_milestones` (tangga per guild) dan `referral_claims` (histori klaim per member per milestone, mencegah reward dobel).
+
+---
+
 # Anti-Raid Protection
 
 Purpose: deteksi lonjakan join massal (bot raid) dan otomatis kick akun-akun mencurigakan sebelum sempat spam/scam channel. Melengkapi AutoMod (yang fokus ke pola pesan) dari sisi join-gate. Ga perlu command setup terpisah — otomatis aktif begitu bot online, dan laporannya dikirim ke channel yang sama dengan AutoMod (`/automod-setup`).

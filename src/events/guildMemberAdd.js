@@ -2,6 +2,7 @@ import { resolveUsedInvite } from "../utils/inviteCache.js";
 import { recordJoin } from "../database/inviteTracking.js";
 import { trackJoin, isNewAccount } from "../utils/antiRaid.js";
 import { handleRaidTrigger, handleSuspiciousJoin } from "../utils/raidAction.js";
+import { checkReferralMilestones, notifyReferralRewards } from "../utils/referralRewards.js";
 
 export default {
 
@@ -21,6 +22,18 @@ export default {
             used?.inviterId ?? null,
             used?.code ?? null
         );
+
+        // Referral Rewards: invite aktif inviter-nya baru aja nambah satu —
+        // cek apakah itu barusan nembus milestone baru.
+        if (used?.inviterId) {
+
+            const earned = checkReferralMilestones(member.guild.id, used.inviterId);
+
+            if (earned.length) {
+                await notifyReferralRewards(member.client, member.guild, used.inviterId, earned);
+            }
+
+        }
 
         // Anti-Raid: cek dulu apakah join ini bagian dari gelombang
         // mencurigakan sebelum lanjut ke hal lain.

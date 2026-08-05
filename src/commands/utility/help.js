@@ -42,6 +42,7 @@ const CONTENT = {
                 lines: [
                     "Klaim `/daily` tiap hari — streak nambah bonusnya",
                     "Naik level dari aktif chat (level × 10 💎)",
+                    "Ajak orang gabung — invite aktif kamu nembus milestone tertentu dapet bonus Shards (`/referral-milestones`)",
                     "Event & giveaway dari admin"
                 ]
             },
@@ -52,7 +53,7 @@ const CONTENT = {
                     "Tiket jasa (Design/Dev/Cinematic) yang selesai bakal di-DM minta rating ⭐ — hasilnya masuk channel testimonial",
                     "`/my-orders` — lihat histori tiket kamu sendiri (kategori, status, rating yang kamu kasih)",
                     "`/suggest` — kasih ide buat server, komunitas bisa vote 👍👎",
-                    "`/invites` `/invites-leaderboard` — cek/lihat siapa paling banyak ngundang member"
+                    "`/invites` `/invites-leaderboard` `/referral-milestones` — cek invite kamu & progress ke reward berikutnya"
                 ]
             }
         ],
@@ -77,13 +78,15 @@ const CONTENT = {
                 "`/automod-setup` `/modlog-setup` — channel laporan AutoMod & mod-log",
                 "`/creator-review-setup` — channel review aplikasi content creator",
                 "`/lofi-setup` — voice channel jam Lofi Radio (WIB)",
-                "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — role reward per level"
+                "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — role reward per level",
+                "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — milestone Shards untuk inviter"
             ]
         },
         adminTools: {
             title: "🛠️ Admin — Tools",
             lines: [
                 "`/sync-rewards` — apply role reward level ke semua member",
+                "`/referral-sync` — cek ulang milestone referral semua inviter",
                 "`/give-shards` — beri/kurangi Shards member",
                 "`/remove-initiate` — lepas role Initiate massal",
                 "`/stats` — statistik aktivitas & economy server"
@@ -117,6 +120,7 @@ const CONTENT = {
                 lines: [
                     "Claim `/daily` every day — streaks boost the bonus",
                     "Level up by chatting (level × 10 💎)",
+                    "Invite people — hit an active-invite milestone for bonus Shards (`/referral-milestones`)",
                     "Admin events & giveaways"
                 ]
             },
@@ -127,7 +131,7 @@ const CONTENT = {
                     "Finished service tickets (Design/Dev/Cinematic) get a DM asking for a ⭐ rating — results go to the testimonial channel",
                     "`/my-orders` — view your own ticket history (category, status, the rating you gave)",
                     "`/suggest` — share an idea for the server, the community can vote 👍👎",
-                    "`/invites` `/invites-leaderboard` — check/see who's invited the most members"
+                    "`/invites` `/invites-leaderboard` `/referral-milestones` — check your invites & progress toward the next reward"
                 ]
             }
         ],
@@ -152,13 +156,15 @@ const CONTENT = {
                 "`/automod-setup` `/modlog-setup` — AutoMod & mod-log report channels",
                 "`/creator-review-setup` — content creator application review channel",
                 "`/lofi-setup` — Lofi Radio voice channel clock (WIB)",
-                "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — per-level role rewards"
+                "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — per-level role rewards",
+                "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — Shards milestones for inviters"
             ]
         },
         adminTools: {
             title: "🛠️ Admin — Tools",
             lines: [
                 "`/sync-rewards` — apply level role rewards to all members",
+                "`/referral-sync` — re-check every inviter against the milestone ladder",
                 "`/give-shards` — give/deduct a member's Shards",
                 "`/remove-initiate` — bulk-remove the Initiate role",
                 "`/stats` — server activity & economy statistics"
