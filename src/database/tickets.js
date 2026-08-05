@@ -38,8 +38,8 @@ const nextNumberStmt = db.prepare(
 );
 
 const insertStmt = db.prepare(`
-    INSERT INTO tickets (guild_id, number, user_id, channel_id, status, created_at)
-    VALUES (@guildId, @number, @userId, @channelId, 'open', @createdAt)
+    INSERT INTO tickets (guild_id, number, user_id, channel_id, category, status, created_at)
+    VALUES (@guildId, @number, @userId, @channelId, @category, 'open', @createdAt)
 `);
 
 const openByUserStmt = db.prepare(`
@@ -48,7 +48,7 @@ const openByUserStmt = db.prepare(`
 `);
 
 const byChannelStmt = db.prepare(`
-    SELECT number, user_id, created_at FROM tickets
+    SELECT number, user_id, category, created_at FROM tickets
     WHERE guild_id = ? AND channel_id = ? AND status = 'open'
 `);
 
@@ -59,9 +59,10 @@ const closeStmt = db.prepare(`
 
 /**
  * Buat tiket baru (transaksi: nomor urut + insert atomik).
- * Balikin { number }.
+ * category = id dari config/ticketCategories.js (boleh null buat
+ * kompatibilitas kalau ada caller lama). Balikin { number }.
  */
-export const createTicket = db.transaction((guildId, userId, channelId) => {
+export const createTicket = db.transaction((guildId, userId, channelId, category = null) => {
 
     const number = nextNumberStmt.get(guildId).next;
 
@@ -70,6 +71,7 @@ export const createTicket = db.transaction((guildId, userId, channelId) => {
         number,
         userId,
         channelId,
+        category,
         createdAt: Date.now()
     });
 
@@ -86,7 +88,9 @@ export function getOpenTicket(guildId, userId) {
 /** Data tiket open berdasarkan channel-nya (null kalau bukan channel tiket). */
 export function getTicketByChannel(guildId, channelId) {
     const row = byChannelStmt.get(guildId, channelId);
-    return row ? { number: row.number, userId: row.user_id, createdAt: row.created_at } : null;
+    return row
+        ? { number: row.number, userId: row.user_id, category: row.category, createdAt: row.created_at }
+        : null;
 }
 
 /** Tandai tiket closed. Balikin true kalau ada yang ter-update. */

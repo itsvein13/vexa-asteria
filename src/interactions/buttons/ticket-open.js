@@ -1,20 +1,11 @@
 import {
-    EmbedBuilder,
     ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ChannelType,
-    PermissionFlagsBits,
+    StringSelectMenuBuilder,
     MessageFlags
 } from "discord.js";
 
-import {
-    getTicketConfig,
-    getOpenTicket,
-    createTicket
-} from "../../database/tickets.js";
-
-import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
+import { getTicketConfig, getOpenTicket } from "../../database/tickets.js";
+import TICKET_CATEGORIES from "../../config/ticketCategories.js";
 
 export default {
 
@@ -32,7 +23,9 @@ export default {
             });
         }
 
-        // Satu tiket aktif per member
+        // Satu tiket aktif per member — dicek di sini juga (bukan cuma
+        // di langkah select kategori) biar user langsung tau tanpa
+        // perlu milih kategori dulu.
         const existing = getOpenTicket(guild.id, interaction.user.id);
 
         if (existing) {
@@ -42,88 +35,22 @@ export default {
             });
         }
 
-        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-
-        let channel;
-
-        try {
-
-            channel = await guild.channels.create({
-                name: `ticket-${interaction.user.username}`.slice(0, 90),
-                type: ChannelType.GuildText,
-                parent: config.categoryId,
-                permissionOverwrites: [
-                    {
-                        id: guild.roles.everyone.id,
-                        deny: [PermissionFlagsBits.ViewChannel]
-                    },
-                    {
-                        id: interaction.user.id,
-                        allow: [
-                            PermissionFlagsBits.ViewChannel,
-                            PermissionFlagsBits.SendMessages,
-                            PermissionFlagsBits.ReadMessageHistory
-                        ]
-                    },
-                    {
-                        id: config.staffRoleId,
-                        allow: [
-                            PermissionFlagsBits.ViewChannel,
-                            PermissionFlagsBits.SendMessages,
-                            PermissionFlagsBits.ReadMessageHistory
-                        ]
-                    },
-                    {
-                        id: guild.members.me.id,
-                        allow: [
-                            PermissionFlagsBits.ViewChannel,
-                            PermissionFlagsBits.SendMessages,
-                            PermissionFlagsBits.ManageChannels,
-                            PermissionFlagsBits.ReadMessageHistory
-                        ]
-                    }
-                ]
-            });
-
-        } catch (error) {
-            console.error("Gagal membuat channel tiket:", error.message);
-            return interaction.editReply({
-                content: "❌ Gagal membuat tiket — cek permission bot (Manage Channels) & kategori."
-            });
-        }
-
-        const { number } = createTicket(guild.id, interaction.user.id, channel.id);
-
-        // Rename dengan nomor urut (best-effort, nama username tetap ok kalau gagal)
-        await channel.setName(`ticket-${String(number).padStart(4, "0")}`).catch(() => {});
-
-        const embed = new EmbedBuilder()
-            .setColor(EMBED_COLOR)
-            .setTitle(`🎫 Ticket #${String(number).padStart(4, "0")}`)
-            .setDescription([
-                `Halo ${interaction.user}! Jelaskan keperluanmu di sini.`,
-                `Tim <@&${config.staffRoleId}> akan segera merespons.`,
-                "",
-                "-# Staff atau kamu bisa menutup tiket dengan tombol di bawah."
-            ].join("\n"))
-            .setFooter(EMBED_FOOTER);
-
         const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("ticket-close")
-                .setLabel("Close Ticket")
-                .setEmoji("🔒")
-                .setStyle(ButtonStyle.Danger)
+            new StringSelectMenuBuilder()
+                .setCustomId("ticket-category-select")
+                .setPlaceholder("Pilih kategori kebutuhan kamu...")
+                .addOptions(TICKET_CATEGORIES.map(c => ({
+                    label: c.label,
+                    description: c.description,
+                    value: c.id,
+                    emoji: c.emoji
+                })))
         );
 
-        await channel.send({
-            content: `${interaction.user} <@&${config.staffRoleId}>`,
-            embeds: [embed],
-            components: [row]
-        });
-
-        await interaction.editReply({
-            content: `✅ Tiket kamu dibuat: ${channel}`
+        await interaction.reply({
+            content: "🎫 Sebelum tiket dibuat, pilih dulu kategori yang paling sesuai sama kebutuhan kamu:",
+            components: [row],
+            flags: MessageFlags.Ephemeral
         });
 
     }

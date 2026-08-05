@@ -10,6 +10,7 @@ import {
     closeTicket
 } from "../../database/tickets.js";
 
+import { getTicketCategory } from "../../config/ticketCategories.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 import safeSend from "../../utils/safeSend.js";
 
@@ -106,14 +107,17 @@ export default {
 
         if (logChannel) {
 
+            const category = ticket.category ? getTicketCategory(ticket.category) : null;
+
             const embed = new EmbedBuilder()
                 .setColor(EMBED_COLOR)
                 .setTitle(`🎫 Ticket #${numberTag} ditutup`)
                 .setDescription([
                     `Pembuat: <@${ticket.userId}>`,
+                    category ? `Kategori: **${category.emoji} ${category.label}**` : "",
                     `Ditutup oleh: ${interaction.user}`,
                     `Dibuka: <t:${Math.floor(ticket.createdAt / 1000)}:f>`
-                ].join("\n"))
+                ].filter(Boolean).join("\n"))
                 .setFooter(EMBED_FOOTER)
                 .setTimestamp();
 

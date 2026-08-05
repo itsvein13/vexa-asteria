@@ -122,6 +122,7 @@ db.exec(`
         number INTEGER NOT NULL,
         user_id TEXT NOT NULL,
         channel_id TEXT NOT NULL,
+        category TEXT,
         status TEXT NOT NULL DEFAULT 'open',
         created_at INTEGER NOT NULL DEFAULT 0,
         closed_at INTEGER,
@@ -181,5 +182,16 @@ db.exec(`
     CREATE INDEX IF NOT EXISTS idx_invite_uses_inviter
         ON invite_uses (guild_id, inviter_id, left_at);
 `);
+
+// Migrasi kolom: instalasi lama sudah punya tabel `tickets` dari sebelum
+// kategori tiket ada, jadi CREATE TABLE IF NOT EXISTS di atas ga
+// nambahin kolomnya. Cek dulu, tambahin kalau belum ada — data tiket
+// lama tetap aman, cuma category-nya kosong (null) buat tiket lama.
+const ticketColumns = db.prepare("PRAGMA table_info(tickets)").all().map(c => c.name);
+
+if (!ticketColumns.includes("category")) {
+    db.exec("ALTER TABLE tickets ADD COLUMN category TEXT");
+    console.log("📦 Migrasi: kolom 'category' ditambahkan ke tabel tickets");
+}
 
 export default db;

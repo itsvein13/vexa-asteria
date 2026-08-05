@@ -39,6 +39,25 @@ Future Plan
 
 ---
 
+# Ticket System
+
+Purpose: channel privat 1-on-1 antara member dan staff, dengan kategori kebutuhan biar staff langsung tau ini soal apa sebelum buka channel-nya.
+
+- `/ticket-setup staff:<role> category:<kategori channel> log:<channel>` (Administrator) — kirim panel "Open Ticket" ke channel yang dipilih.
+- Alur member: klik **Open Ticket** → pilih salah satu kategori dari select menu → channel privat otomatis dibuat (cuma kelihatan member itu + role staff + Vexa), dinomori urut per-server (`ticket-0001`, dst).
+- Kategori tiket (`config/ticketCategories.js` — gampang ditambah/diubah):
+  1. 🎨 **Design & Video Editing** — Video Editing, Graphic, Clothing, UI/UX Design
+  2. 💻 **Web & App Development** — Web Programming, SaaS, Mobile Apps
+  3. 🎬 **FiveM & NFS Cinematic** — Cinematic, Foto, dan Editing Include
+  4. ⚠️ **Complain** — keluhan atau laporan masalah
+  5. 💬 **General Inquiry** — pertanyaan umum, partnership, atau hal lain di luar 4 kategori atas (kategori tambahan biar ga ada member yang kepaksa milih kategori yang salah)
+- Kategori yang dipilih kelihatan di topic channel dan embed pembuka tiket, jadi staff langsung ngerti konteksnya tanpa nanya ulang.
+- Satu member cuma boleh punya satu tiket aktif dalam satu waktu (dicek dua kali: pas klik Open Ticket dan pas pilih kategori, buat jaga-jaga race condition).
+- `/ticket-close` (tombol di channel tiket) — cuma pembuat tiket atau staff yang bisa menutup. Transcript (sampai 500 pesan terakhir) diarsipkan sebagai file `.txt` dan dikirim ke log channel bareng info kategori, lalu channel-nya otomatis terhapus.
+- Database: tabel `tickets` (nomor urut per-guild, kategori, status) dan `ticket_config` (role staff, kategori channel, log channel per-guild). Instalasi lama yang tiket-nya udah jalan sebelum fitur kategori ini otomatis ter-migrasi (kolom `category` ditambahkan tanpa data lama hilang, tiket lama cuma kategori-nya kosong).
+
+---
+
 # AutoMod: Cross-Post Spam Detection
 
 Purpose: nangkep pola self-bot/akun ke-compromise yang nyepam giveaway palsu (foto Elon Musk, MrBeast, dsb) ke banyak channel sekaligus.
