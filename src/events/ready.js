@@ -49,21 +49,25 @@ export default {
                 },
 
                 {
-                    name: "Need roles? Visit #role-menu",
+                    name: "hidup segan, offline pun sayang",
                     type: ActivityType.Playing
                 },
 
                 {
-                    name: "Synd1cate Community",
+                    name: "sibuk (padahal enggak)",
                     type: ActivityType.Watching
                 },
 
                 {
-                    name: "Official Synd1cate Bot",
+                    name: "bang asle kenapa suka marah ya? 🥺",
                     type: ActivityType.Watching
                 },
                 {
-                    name: "BANG ASLE? PANTEEEEKK",
+                    name: "gue aktif kalo owner gue on aja coy",
+                    type: ActivityType.Watching
+                },
+                {
+                    name: "Official Synd1cate Bot",
                     type: ActivityType.Watching
                 }
 
