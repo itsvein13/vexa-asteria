@@ -8,7 +8,7 @@ import { syncRoleRewards } from "../utils/roleRewards.js";
 import { checkCrossPostSpam } from "../utils/antiSpam.js";
 import { handleCrossPostSpam } from "../utils/spamAction.js";
 import { AI_CONFIG } from "../config/ai.config.js";
-import { checkAiQuota } from "../utils/aiRateLimit.js";
+import { checkAiQuota, getAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
 import { shouldRoastAsley, asleyLine } from "../utils/asleySlander.js";
@@ -101,13 +101,24 @@ async function handleAiMention(message, client) {
     const owner = isOwner(message.author.id, message.member);
 
     // Perintah moderasi/admin — AI nggak pernah ngambil alih dari siapa pun,
-    // termasuk owner. Jawab pendek aja.
+    // INCLUDING owner. Cek ini DULUAN sebelum perintah khusus owner,
+    // biar "kasih gue role admin" nggak ke-trigger perintah lain.
     if (mentionsForbiddenAction(prompt)) {
         await safeSend(message.channel, {
             content: `${message.author} Itu urusan staff, gue nggak bisa bantu.`,
             allowedMentions: { parse: [] }
         });
         return;
+    }
+
+    // Perintah khusus owner — setelah filter moderasi, sebelum kuota,
+    // karena owner memang dibekalin bebas.
+    if (owner) {
+
+        const direct = handleOwnerCommand(message, client, prompt);
+
+        if (direct) return;
+
     }
 
     // Kuota per user (owner bebas).
@@ -173,6 +184,79 @@ async function handleAiMention(message, client) {
 }
 
 /**
+ * Perintah khusus owner. Hanya owner (userId/role) yang bisa.
+ * Nggak nyentuh aksi berbahaya — cuma hal yang aman dan berguna.
+ * @returns {boolean} true kalau prompt cocok dan udah dibalas.
+ */
+function handleOwnerCommand(message, client, prompt) {
+
+    const lower = prompt.toLowerCase();
+
+    // Kasih tau Asley pantek — manual, nggak nunggu jadwal.
+    if (/\b(asley|asle)\b/.test(lower) && /(pantek|kejek|sindir|ingetin|roast)/.test(lower)) {
+
+        const line = asleyLine(Date.now() + message.id);
+
+        const target = message.mentions?.users?.first?.() ?? null;
+        const tag = target ? `<@${target.id}>` : "Bang Asley";
+
+        safeSend(message.channel, {
+            content: `${tag} ${line}`,
+            allowedMentions: { parse: [] }
+        });
+
+        return true;
+
+    }
+
+    // Kirim pesan ke channel lain — paling sering dibutuhin owner.
+    const dm = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\s+(?:ke\s+)?(.+)$/);
+
+    if (dm) {
+
+        const targetChannel = message.mentions?.channels?.first?.()
+            ?? client.channels.cache.get(AI_CONFIG.channel.vexaAiChannelId);
+
+        if (!targetChannel?.isTextBased?.()) {
+            safeSend(message.channel, { content: "Channel tujuannya nggak ketemu, bro." });
+            return true;
+        }
+
+        const body = prompt.replace(dm[0], "").trim();
+
+        if (!body) {
+            safeSend(message.channel, { content: "Pesannya apa, bro?" });
+            return true;
+        }
+
+        safeSend(targetChannel, { content: body.slice(0, 1900) });
+
+        safeSend(message.channel, { content: "Udah gue kirim." });
+
+        return true;
+
+    }
+
+    // Owner nanya sisa kuota sendiri — biar nggak perlu /ai-status.
+    if (/(kuota|sisa|limit|jatah)\s*(gue|aku|lu|kamu|owner)/.test(lower)) {
+
+        const q = getAiQuota(message.author.id, message.channelId);
+
+        safeSend(message.channel, {
+            content: q.owner
+                ? "Lu owner — kuota nggak dibatasi."
+                : `Sisa kuota lu: ${q.remaining}/${q.limit}.`
+        });
+
+        return true;
+
+    }
+
+    return false;
+
+}
+
+/**
  * Deteksi kalau prompt minta aksi moderasi/admin yang nggak boleh
  * diambil alih AI.
  */
@@ -191,6 +275,17 @@ function mentionsForbiddenAction(prompt) {
 
     const target = /(member|orang|dia|gue|aku|lu|kamu|orang itu|akun)/;
 
-    return verbs.some(v => lower.includes(v)) && target.test(lower);
+    if (verbs.some(v => lower.includes(v)) && target.test(lower)) return true;
+
+    // Kasih/naikin jabatan atau role sensitif — sering kejelasan
+    // "kasih gue role admin". Harus cek sebelum perintah "kirim pesan",
+    // karena "kasih" juga ke-match di situ.
+    const grant = /(kasih|beri|bagi|buatin|bikin|naikin|jadiin|jadikan|tambahin|add)\s+(gue|aku|saya|lu|kamu|dia|orang\s*itu)?\s*(jadi\s+)?(role|jabatan|rank|staff|moderator|admin|owner|root|developer)/;
+    if (grant.test(lower)) return true;
+
+    // Bocorin kredensial.
+    const creds = /(bocorkan|tampilkan|kasih\s+tau|sebutin|kirim)\s*(token|api\s*key|secret|password|kunci)/;
+
+    return creds.test(lower);
 
 }
