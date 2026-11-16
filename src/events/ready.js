@@ -1,6 +1,7 @@
 import { ActivityType, EmbedBuilder } from "discord.js";
 import { startClockUpdater } from "../utils/clockChannel.js";
 import { cacheGuildInvites } from "../utils/inviteCache.js";
+import { startAiChannelCleaner } from "../utils/aiChannel.js";
 import { AI_CONFIG } from "../config/ai.config.js";
 import safeSend from "../utils/safeSend.js";
 
@@ -155,6 +156,9 @@ export default {
 
         // Panel pembuka di #vexa-ai (sekali, kalau belum ada).
         await postAiStarter(client);
+
+        // Bersihkan pesan user di #vexa-ai yang > 20 menit.
+        startAiChannelCleaner(client);
 
         // Invite tracker: populate cache snapshot tiap guild biar
         // guildMemberAdd bisa diff & tau siapa yang invite siapa.
