@@ -1,27 +1,43 @@
-// Rate limit in-memory per Discord user. Reset saat bot restart.
-// Ini pengaman biar kuota Gemini gratis nggak habis.
+// Kuota per user, dibedakan per channel:
+// - #vexa-ai  → 2 pesan per 24 jam
+// - lainnya   → 1 pesan per 24 jam
+// Owner bebas.
 
 import { AI_CONFIG } from "../config/ai.config.js";
 
 const buckets = new Map();
 
-export function checkAiRateLimit(userId, { limit, windowMs } = {}) {
+export function isVexaAiChannel(channelId) {
+    return String(channelId ?? "") === String(AI_CONFIG.channel.vexaAiChannelId);
+}
 
-    const max = Number.isInteger(limit) && limit > 0 ? limit : 5;
-    const window = Number.isFinite(windowMs) && windowMs > 0 ? windowMs : 10 * 60 * 1000;
+function limitFor(channelId) {
+    return isVexaAiChannel(channelId)
+        ? AI_CONFIG.limits.vexaAiChannelLimit
+        : AI_CONFIG.limits.otherChannelLimit;
+}
+
+/**
+ * Cek + catat kuota user di channel tertentu.
+ * @returns {{ allowed: boolean, retryAfterMs: number, remaining: number }}
+ */
+export function checkAiQuota(userId, channelId) {
 
     const key = String(userId);
-    const now = Date.now();
 
-    // Owner bebas dari rate limit.
     if (key === String(AI_CONFIG.limits.ownerUserId)) {
         return { allowed: true, retryAfterMs: 0, remaining: Number.MAX_SAFE_INTEGER };
     }
 
-    const hits = (buckets.get(key) ?? []).filter(ts => now - ts < window);
+    const max = limitFor(channelId);
+    const window = AI_CONFIG.limits.windowMs;
+    const now = Date.now();
+    const bucketKey = `${key}:${String(channelId ?? "dm")}`;
+
+    const hits = (buckets.get(bucketKey) ?? []).filter(ts => now - ts < window);
 
     if (hits.length >= max) {
-        buckets.set(key, hits);
+        buckets.set(bucketKey, hits);
         return {
             allowed: false,
             retryAfterMs: Math.max(window - (now - hits[0]), 0),
@@ -30,12 +46,18 @@ export function checkAiRateLimit(userId, { limit, windowMs } = {}) {
     }
 
     hits.push(now);
-    buckets.set(key, hits);
+    buckets.set(bucketKey, hits);
 
     return { allowed: true, retryAfterMs: 0, remaining: max - hits.length };
 }
 
-export function resetAiRateLimit(userId) {
+/** Reset manual (testing). */
+export function resetAiQuota(userId) {
     if (userId === undefined) buckets.clear();
-    else buckets.delete(String(userId));
+    else {
+        const prefix = `${String(userId)}:`;
+        for (const key of buckets.keys()) {
+            if (key.startsWith(prefix)) buckets.delete(key);
+        }
+    }
 }

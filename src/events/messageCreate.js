@@ -8,9 +8,10 @@ import { syncRoleRewards } from "../utils/roleRewards.js";
 import { checkCrossPostSpam } from "../utils/antiSpam.js";
 import { handleCrossPostSpam } from "../utils/spamAction.js";
 import { AI_CONFIG } from "../config/ai.config.js";
-import { checkAiRateLimit } from "../utils/aiRateLimit.js";
+import { checkAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt } from "../utils/aiSecurity.js";
+import { shouldRoastAsley, asleyLine } from "../utils/asleySlander.js";
 
 export default {
 
@@ -31,8 +32,15 @@ export default {
             return;
         }
 
-        // AI mention dihandle duluan, biar nggak kena return di bawah
-        // (cooldown XP bikin result null — AI jadi nggak pernah jalan).
+        // Sindiran buat Asley — 1x per minggu, di channel mana aja.
+        if (shouldRoastAsley(message.author.id)) {
+            await safeSend(message.channel, {
+                content: asleyLine(message.createdTimestamp),
+                allowedMentions: { parse: [] }
+            });
+        }
+
+        // AI mention dihandle sebelum return XP di bawah (cooldown bikin null).
         await handleAiMention(message, client);
 
         const result = addMessageXP(message.author.id, message.guild.id);
@@ -75,8 +83,8 @@ export default {
 };
 
 /**
- * Balas pesan yang nge-mention bot. Jawaban dikirim sebagai reply
- * ke pesan user, jadi konteksnya jelas.
+ * Balas pesan yang nge-mention bot. Kuota: 2 pesan di #vexa-ai,
+ * 1 pesan di channel lain, per 24 jam.
  */
 async function handleAiMention(message, client) {
 
@@ -89,16 +97,13 @@ async function handleAiMention(message, client) {
 
     if (!prompt) return;
 
-    // Rate limit — owner dikecualikan.
-    const limit = checkAiRateLimit(
-        message.author.id,
-        AI_CONFIG.limits.rateLimit
-    );
+    // Kuota per user (owner bebas).
+    const quota = checkAiQuota(message.author.id, message.channelId);
 
-    if (!limit.allowed) {
-        const seconds = Math.ceil(limit.retryAfterMs / 1000);
+    if (!quota.allowed) {
         await safeSend(message.channel, {
-            content: `⏳ ${message.author} terlalu banyak nanya. Coba lagi dalam ${seconds} detik.`
+            content: `${message.author} ${AI_CONFIG.limitMessage(quota.retryAfterMs / 60000)}`,
+            allowedMentions: { parse: [] }
         });
         return;
     }

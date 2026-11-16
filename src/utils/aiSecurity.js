@@ -20,6 +20,12 @@ export function validatePrompt(input) {
         );
     }
 
+    // Whitelist dulu: percakapan wajar (curhat, tanya cara jadi admin)
+    // nggak boleh kena filter.
+    for (const pattern of AI_CONFIG.security.allowPatterns ?? []) {
+        if (pattern.test(prompt)) return prompt;
+    }
+
     for (const pattern of AI_CONFIG.security.injectionPatterns) {
         if (pattern.test(prompt)) {
             throw new AiError("INVALID", "Gagal, bro. Coba lagi — dengan cara yang bener.");

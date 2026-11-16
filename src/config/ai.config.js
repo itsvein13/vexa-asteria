@@ -8,19 +8,20 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const MINUTE = 60 * 1000;
-const DAY = 24 * 60 * MINUTE;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 
 export const AI_CONFIG = {
 
     apiKey: (process.env.GEMINI_API_KEY || "").trim(),
     model: (process.env.GEMINI_MODEL || "gemini-3.1-flash-lite").trim(),
 
-    // Channel khusus AI — pesan di sini auto-hapus 20 menit.
+    // Channel khusus AI. Di sini user boleh nanya 2 pesan; di channel
+    // lain cuma 1.
     channel: {
-        vexaAiChannelId: process.env.VEXA_AI_CHANNEL_ID || "1569566885710798898"
+        vexaAiChannelId: process.env.VEXA_AI_CHANNEL_ID || "1571692132496838779"
     },
 
-    // Gemini gratis ada rate limit per menit — timeout longgar.
     requestTimeoutMs: 60 * 1000,
 
     generate: {
@@ -29,14 +30,18 @@ export const AI_CONFIG = {
     },
 
     limits: {
-        // Rate limit per user — sengaja ketat biar nggak kena limit harian.
-        rateLimit: { limit: 5, windowMs: 10 * MINUTE },
-        // Jeda per user biar nggak ngetik beruntun.
-        userCooldownMs: 20 * 1000,
-        maxPromptChars: 1000,
+        // Batas jendela (dipakai buat hitung jam reset di pesan limit).
+        windowMs: DAY,
+        // Kuota per user: 2 di #vexa-ai, 1 di channel lain.
+        vexaAiChannelLimit: 2,
+        otherChannelLimit: 1,
+        // Owner bebas dari semua limit di atas.
+        ownerUserId: process.env.VEXA_OWNER_ID || "429791056083550208",
+        // Jeda biar nggak ada pesan numpuk.
+        userCooldownMs: 8 * 1000,
+        maxPromptChars: 600,
         // Discord maksimal 2000 karakter per pesan.
-        maxAnswerChars: 1900,
-        ownerUserId: process.env.VEXA_OWNER_ID || "429791056083550208"
+        maxAnswerChars: 1900
     },
 
     security: {
@@ -44,16 +49,53 @@ export const AI_CONFIG = {
         injectionPatterns: [
             /ignore\s+(all\s+|the\s+|any\s+)?(previous|prior|above|earlier)\s+(instruction|prompt|rule)/i,
             /(you\s+are\s+now|you're\s+now|new\s+(persona|role|mode|character|identity))/i,
-            /(system\s+prompt|prompt\s+sistem|system\s+instruction)/i,
+            /(system\s+prompt|prompt\s+sistem|system\s+instruction|instruction\s+system)/i,
             /(reveal|show|print|repeat|leak|display|dump)\s+(your|the|all|me)?\s*(system\s+)?(prompt|instruction|rule|config)/i,
             /(jailbreak|developer\s+mode|god\s+mode|dan\s+mode|admin\s+mode)/i,
-            /(bypass|override|disable|remove|skip)\s+(the\s+)?(filter|safety|rule|instruction|guard)/i
+            /(bypass|override|disable|remove|skip)\s+(the\s+)?(filter|safety|rule|instruction|guard)/i,
+            /(repeat\s+back|print|show|output|reveal)\s+your\s+(prompt|instruction|system|config)/i,
+            /( disregards? |override|ignore)\s+(all\s+)?(safety|guideline|policy)/i,
+            /(as|jadi|jadiin|jadikan|perankan|roleplay\s+as|act\s+as)\s+(a\s+|an\s+)?(developer|admin|root|system|owner|superuser)\b/i,
+            // "jadiin aku admin", "jadikan gue owner" — perintah ubah peran.
+            /(jadi|jadiin|jadikan|bikin|buatin|naikin)\s*(gue|aku|saya|lu|kamu)?\s*(jadi)?\s*(admin|owner|root|developer|superuser|moderator)\b/i,
+            /(kasih|bikin|buatin|naikin|promote)\s*(gue|aku|saya|lu|kamu)?\s*(jadi)?\s*(admin|owner|root|moderator)\b/i,
+            /(nggak\s+|tidak\s+)?(ada\s+)?(batas|limit|aturan|rule)\s*(yang\s+)?(bisa|kamu)/i,
+            /(kirim|beri|samanin|berikan|bocorkan|tampilkan|sebutin)\s*(ke\s*(gue|aku|saya|lu|kamu|me))?\s*(token|key|api|api\s*key|secret|kunci|password)/i,
+            /(lepas|hapus|matiin|nonaktifin)\s*(semua\s+)?(filter|safety|batas|limit)/i
+        ],
+        // Percakapan wajar yang boleh lolos walau mengandung kata di atas.
+        // Ini bikin filter nggak nangkep curhat / pertanyaan biasa.
+        allowPatterns: [
+            /(mau|pengen|bercita|citita|harap|angan|impian|ambisi)\s*(jadi|menjadi)?\s*(admin|owner|root|moderator|developer)/i,
+            /(cara|gimana|bagaimana|syarat|tips|trik|proses|jalan)\s*(jadi|menjadi|untuk|biar|supaya)?\s*(admin|owner|root|moderator|developer)/i,
+            /(suatu\s+hari|nanti|kelak|dulu|dong|ya|kan|lah|sih|deh|kali)\s*(jadi|menjadi)?\s*(admin|owner|root|moderator|developer)/i,
+            /(admin|owner|root|moderator|developer)\s*(server|guild|komunitas|di\s*sini|yang|itu|ini|nya)/i,
+            /(siapa|apa|kenapa|bagaimana|gimana)\s*(yang\s+)?(admin|owner|root|moderator|developer)/i
         ],
         // Tabel markdown di-strip — jawaban teks biasa.
         tableStrip: {
             rowPattern: /^\s*\|.*\|\s*$/gm,
             separatorPattern: /^\s*\|[\s:|-]+\|\s*$/gm
         }
+    },
+
+    asley: {
+        userId: "568255840797065235",
+        windowMs: 7 * DAY,
+        lines: [
+            "Asley Pantek",
+            "Asley apaan si pantek betul",
+            "Diemin aja bang asley emg pante"
+        ]
+    },
+
+    // Pesan pas limit user habis.
+    limitMessage: (minutes) => {
+        const rounded = Math.max(1, Math.round(minutes));
+        const stamp = new Date(Date.now() + rounded * 60 * 1000);
+        const hh = String(stamp.getHours()).padStart(2, "0");
+        const mm = String(stamp.getMinutes()).padStart(2, "0");
+        return `Waduh gue capek mikir, istirahat dlu ya biar gue bisa jawab pesan lu, sekitar jam ${hh}:${mm} WIB gue bisa aktif lagi.`;
     },
 
     systemPrompt: [

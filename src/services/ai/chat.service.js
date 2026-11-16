@@ -2,7 +2,7 @@ import { AI_CONFIG } from "../../config/ai.config.js";
 import { AiError, chat as geminiChat, getStatus } from "./gemini.client.js";
 import { validatePrompt, sanitizeOutput } from "../../utils/aiSecurity.js";
 
-// Jeda per user — mencegah ngetik beruntun.
+// Jeda per user — mencegah pesan numpuk.
 const lastUse = new Map();
 
 export function checkCooldown(userId) {
