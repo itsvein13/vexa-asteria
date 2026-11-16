@@ -7,12 +7,16 @@ import safeSend from "../utils/safeSend.js";
 import { syncRoleRewards } from "../utils/roleRewards.js";
 import { checkCrossPostSpam } from "../utils/antiSpam.js";
 import { handleCrossPostSpam } from "../utils/spamAction.js";
+import { AI_CONFIG } from "../config/ai.config.js";
+import { checkAiRateLimit } from "../utils/aiRateLimit.js";
+import { checkCooldown, ask } from "../services/ai/chat.service.js";
+import { extractMentionPrompt } from "../utils/aiSecurity.js";
 
 export default {
 
     name: "messageCreate",
 
-    async execute(message) {
+    async execute(message, client) {
 
         // Ignore bots, system messages, dan DM (cuma track di server)
         if (message.author.bot) return;
@@ -62,6 +66,87 @@ export default {
 
         }
 
+        // AI mention: @Vexa <pertanyaan>
+        await handleAiMention(message, client);
+
     }
 
 };
+
+/**
+ * Balas pesan yang nge-mention bot. Jawaban dikirim sebagai reply
+ * ke pesan user, jadi konteksnya jelas.
+ */
+async function handleAiMention(message, client) {
+
+    const botUser = client?.user;
+
+    if (!botUser) return;
+    if (!message.mentions?.users?.has(botUser.id)) return;
+
+    const prompt = extractMentionPrompt(message, botUser.id);
+
+    if (!prompt) return;
+
+    // Rate limit — owner dikecualikan.
+    const limit = checkAiRateLimit(
+        message.author.id,
+        AI_CONFIG.limits.rateLimit
+    );
+
+    if (!limit.allowed) {
+        const seconds = Math.ceil(limit.retryAfterMs / 1000);
+        await safeSend(message.channel, {
+            content: `⏳ ${message.author} terlalu banyak nanya. Coba lagi dalam ${seconds} detik.`
+        });
+        return;
+    }
+
+    try {
+        checkCooldown(message.author.id);
+    } catch {
+        // Cooldown aktif — diamkan aja, jangan ganggu.
+        return;
+    }
+
+    // Kasih tahu user kalau bot lagi mikir.
+    try {
+        await message.channel.sendTyping();
+    } catch {
+        // Channel nggak ngizinin typing — lanjut aja.
+    }
+
+    try {
+
+        const startedAt = Date.now();
+        const { answer } = await ask(prompt);
+        const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
+
+        if (!answer) return;
+
+        await safeSend(message.channel, {
+            content: `${message.author} ${answer}\n-# ${AI_CONFIG.model} • ${elapsed}s`,
+            allowedMentions: { parse: [] }
+        });
+
+    } catch (error) {
+
+        const code = error?.code ?? "UNKNOWN";
+        console.error(`[AI] Gagal balas mention (${code}): ${error.message}`);
+
+        const text = code === "QUOTA"
+            ? "Kuota AI habis buat sekarang, coba lagi nanti."
+            : code === "AUTH"
+                ? "API key AI-nya bermasalah, cek lagi."
+                : code === "BLOCKED"
+                    ? "Pertanyaan itu kena filter AI."
+                    : "AI lagi nggak bisa dihubungi, coba lagi.";
+
+        await safeSend(message.channel, {
+            content: text,
+            allowedMentions: { parse: [] }
+        });
+
+    }
+
+}
