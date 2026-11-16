@@ -119,14 +119,12 @@ async function handleAiMention(message, client) {
 
     try {
 
-        const startedAt = Date.now();
         const { answer } = await ask(prompt);
-        const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
 
         if (!answer) return;
 
         await safeSend(message.channel, {
-            content: `${message.author} ${answer}\n-# ${AI_CONFIG.model} • ${elapsed}s`,
+            content: `${message.author} ${answer}`,
             allowedMentions: { parse: [] }
         });
 
