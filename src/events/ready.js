@@ -97,59 +97,32 @@ export default {
 
         let index = 0;
 
+        // Rotasi presence tiap 3 hari — biar nggak ngebosin.
+        const PRESENCE_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000;
+
         async function updatePresence() {
 
-            const total = guild?.memberCount ?? 0;
-
             const activities = [
-
-                {
-                    name: `${total} Members`,
-                    type: ActivityType.Watching
-                },
-
-                {
-                    name: "hidup segan, offline pun sayang",
-                    type: ActivityType.Playing
-                },
-
-                {
-                    name: "sibuk (padahal enggak)",
-                    type: ActivityType.Watching
-                },
-
-                {
-                    name: "bang asle kenapa suka marah ya? 🥺",
-                    type: ActivityType.Watching
-                },
-                {
-                    name: "gue aktif kalo owner gue on aja coy",
-                    type: ActivityType.Watching
-                },
-                {
-                    name: "Official Synd1cate Bot",
-                    type: ActivityType.Watching
-                }
-
+                "mencurahkan hati lewat status doang",
+                "sibuk ngusahain, hasilnya rata-rata",
+                "jatuh bangun, ya bangun lagi",
+                "pengennya istirahat, tapi ada aja",
+                "dengerin lagu yang sama, berulang",
+                "hidup itu antri, sabar itu kunci"
             ];
 
             client.user.setActivity(
-                activities[index].name,
-                {
-                    type: activities[index].type
-                }
+                activities[index],
+                { type: ActivityType.Playing }
             );
 
-            index++;
+            index = (index + 1) % activities.length;
 
-            if (index >= activities.length)
-                index = 0;
+            setTimeout(updatePresence, PRESENCE_INTERVAL_MS);
 
         }
 
         await updatePresence();
-
-        setInterval(updatePresence, 30000);
 
         // Voice clock channel (Lofi Radio) — update jam WIB tiap 5 menit
         startClockUpdater(client);
