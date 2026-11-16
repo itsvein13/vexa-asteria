@@ -210,31 +210,14 @@ function handleOwnerCommand(message, client, prompt) {
     }
 
     // Kirim pesan ke channel lain — paling sering dibutuhin owner.
-    const dm = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\s+(?:ke\s+)?(.+)$/);
+    // Format yang dikenali:
+    //   kirim: teks           kirim ke #channel: teks
+    //   bilangin: teks        pesan: teks
+    //   suruh: teks           info: teks
+    const sent = matchSendCommand(lower);
 
-    if (dm) {
-
-        const targetChannel = message.mentions?.channels?.first?.()
-            ?? client.channels.cache.get(AI_CONFIG.channel.vexaAiChannelId);
-
-        if (!targetChannel?.isTextBased?.()) {
-            safeSend(message.channel, { content: "Channel tujuannya nggak ketemu, bro." });
-            return true;
-        }
-
-        const body = prompt.replace(dm[0], "").trim();
-
-        if (!body) {
-            safeSend(message.channel, { content: "Pesannya apa, bro?" });
-            return true;
-        }
-
-        safeSend(targetChannel, { content: body.slice(0, 1900) });
-
-        safeSend(message.channel, { content: "Udah gue kirim." });
-
-        return true;
-
+    if (sent) {
+        return sendOwnerMessage(message, client, sent);
     }
 
     // Owner nanya sisa kuota sendiri — biar nggak perlu /ai-status.
@@ -253,6 +236,65 @@ function handleOwnerCommand(message, client, prompt) {
     }
 
     return false;
+
+}
+
+/**
+ * Cocokin prompt ke format perintah kirim pesan.
+ * Balikin isi pesan kalau cocok, null kalau bukan perintah kirim.
+ */
+function matchSendCommand(lower) {
+
+    // "kirim: teks" / "kirim ke #channel: teks"
+    const withColon = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\b\s*(?:ke\s+)?(?:#?[\w-]+)?\s*[:\-–]\s*(.+)$/);
+    if (withColon) return withColon[1];
+
+    // "kirim ke #channel teks" — wajib ada "ke" biar "kirim halo"
+    // nggak keanggap channel. Channel name dibatasi 2 kata; kalau
+    // ternyata 3+ kata, anggap channelless biar pesannya utuh.
+    const loose = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\b\s+ke\s+(?:#?[\w-]+(?:\s+[\w-]+)?)\s+(.+)$/);
+    if (loose) {
+        const maybeChannel = lower.slice(
+            lower.indexOf('ke') + 2,
+            lower.length - loose[1].length
+        ).trim();
+        // Channel name > 2 kata → kemungkinan besar bukan channel.
+        if (maybeChannel.split(/\s+/).filter(Boolean).length <= 2) return loose[1];
+    }
+
+    // "kirim teks" — tanpa titik dua dan tanpa channel.
+    const bare = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\b\s+(.+)$/);
+    if (bare) return bare[1];
+
+    return null;
+
+}
+
+/**
+ * Kirim pesan owner ke channel tujuan, lalu konfirmasi.
+ */
+function sendOwnerMessage(message, client, rawBody) {
+
+    const targetChannel = message.mentions?.channels?.first?.()
+        ?? client.channels.cache.get(AI_CONFIG.channel.vexaAiChannelId);
+
+    if (!targetChannel?.isTextBased?.()) {
+        safeSend(message.channel, { content: "Channel tujuannya nggak ketemu, bro." });
+        return true;
+    }
+
+    const body = String(rawBody ?? "").trim().slice(0, 1900);
+
+    if (!body) {
+        safeSend(message.channel, { content: "Pesannya apa, bro?" });
+        return true;
+    }
+
+    safeSend(targetChannel, { content: body });
+
+    safeSend(message.channel, { content: "Udah gue kirim." });
+
+    return true;
 
 }
 
