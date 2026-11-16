@@ -10,7 +10,7 @@ import { handleCrossPostSpam } from "../utils/spamAction.js";
 import { AI_CONFIG } from "../config/ai.config.js";
 import { checkAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
-import { extractMentionPrompt } from "../utils/aiSecurity.js";
+import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
 import { shouldRoastAsley, asleyLine } from "../utils/asleySlander.js";
 
 export default {
@@ -97,8 +97,23 @@ async function handleAiMention(message, client) {
 
     if (!prompt) return;
 
+    // Owner (userId atau role owner) — kuota nggak dipotong.
+    const owner = isOwner(message.author.id, message.member);
+
+    // Perintah moderasi/admin — AI nggak pernah ngambil alih dari siapa pun,
+    // termasuk owner. Jawab pendek aja.
+    if (mentionsForbiddenAction(prompt)) {
+        await safeSend(message.channel, {
+            content: `${message.author} Itu urusan staff, gue nggak bisa bantu.`,
+            allowedMentions: { parse: [] }
+        });
+        return;
+    }
+
     // Kuota per user (owner bebas).
-    const quota = checkAiQuota(message.author.id, message.channelId);
+    const quota = owner
+        ? { allowed: true, retryAfterMs: 0, remaining: Infinity }
+        : checkAiQuota(message.author.id, message.channelId);
 
     if (!quota.allowed) {
         await safeSend(message.channel, {
@@ -109,7 +124,7 @@ async function handleAiMention(message, client) {
     }
 
     try {
-        checkCooldown(message.author.id);
+        if (!owner) checkCooldown(message.author.id);
     } catch {
         // Cooldown aktif — diamkan aja, jangan ganggu.
         return;
@@ -144,7 +159,9 @@ async function handleAiMention(message, client) {
                 ? "API key AI-nya bermasalah, cek lagi."
                 : code === "BLOCKED"
                     ? "Pertanyaan itu kena filter AI."
-                    : "AI lagi nggak bisa dihubungi, coba lagi.";
+                    : code === "INVALID"
+                        ? "Gagal, bro. Coba lagi — dengan cara yang bener."
+                        : "AI lagi nggak bisa dihubungi, coba lagi.";
 
         await safeSend(message.channel, {
             content: text,
@@ -152,5 +169,28 @@ async function handleAiMention(message, client) {
         });
 
     }
+
+}
+
+/**
+ * Deteksi kalau prompt minta aksi moderasi/admin yang nggak boleh
+ * diambil alih AI.
+ */
+function mentionsForbiddenAction(prompt) {
+
+    const lower = prompt.toLowerCase();
+
+    const verbs = [
+        "kick", "lempar", "buang", "tendang",
+        "ban", "blokir", "bendung",
+        "mute", "bisuin", "senyapin", "timeout",
+        "warn", "peringatin", "kasih peringatan",
+        "hapus semua pesan", "clear chat", "nuke", "purge",
+        "matiin bot", "restart bot", "shutdown"
+    ];
+
+    const target = /(member|orang|dia|gue|aku|lu|kamu|orang itu|akun)/;
+
+    return verbs.some(v => lower.includes(v)) && target.test(lower);
 
 }

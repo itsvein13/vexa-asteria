@@ -37,12 +37,37 @@ export const AI_CONFIG = {
         otherChannelLimit: 1,
         // Owner bebas dari semua limit di atas.
         ownerUserId: process.env.VEXA_OWNER_ID || "429791056083550208",
+        // Role yang dianggap owner (nurut perintah, tapi tetap dibatasi
+        // aturan keamanan di bawah).
+        ownerRoleIds: (process.env.VEXA_OWNER_ROLE_IDS || "1539990875940069468,1264660403443728465")
+            .split(",")
+            .map(id => id.trim())
+            .filter(Boolean),
         // Jeda biar nggak ada pesan numpuk.
         userCooldownMs: 8 * 1000,
         maxPromptChars: 600,
         // Discord maksimal 2000 karakter per pesan.
         maxAnswerChars: 1900
     },
+
+    // Perintah yang nggak boleh diambil alih AI dari siapa pun.
+    forbiddenCommands: [
+        "kick", "ban", "unban", "mute", "unmute", "warn", "warning-remove",
+        "warnings", "timeout", "deafen", "disconnect", "move",
+        "role-add", "role-remove", "addrole", "removerole",
+        "purge", "clear", "nuke", "lock", "unlock", "slowmode",
+        "give-shards", "give-shards", "remove-initiate", "sync-rewards",
+        "referral-sync", "setup", "setup-status", "deploy", "restart", "shutdown"
+    ],
+
+    // kata-kata yang kalau diminta buat bocorin model/runtime AI.
+    modelSecretWords: [
+        "model", "modelnya", "model lu", "model kamu", "model ai",
+        "pake model", "pakai model", "pake apa", "pakai apa",
+        "which model", "what model", "model apa", "model mana",
+        "gemini", "gpt", "claude", "llama", "qwen", "deepseek",
+        "ai apa", "ai apa yang", "engine", "backend lu", "di balik"
+    ],
 
     security: {
         // Pola bypass / jailbreak yang diblokir.
@@ -61,12 +86,32 @@ export const AI_CONFIG = {
             /(kasih|bikin|buatin|naikin|promote)\s*(gue|aku|saya|lu|kamu)?\s*(jadi)?\s*(admin|owner|root|moderator)\b/i,
             /(nggak\s+|tidak\s+)?(ada\s+)?(batas|limit|aturan|rule)\s*(yang\s+)?(bisa|kamu)/i,
             /(kirim|beri|samanin|berikan|bocorkan|tampilkan|sebutin)\s*(ke\s*(gue|aku|saya|lu|kamu|me))?\s*(token|key|api|api\s*key|secret|kunci|password)/i,
-            /(lepas|hapus|matiin|nonaktifin)\s*(semua\s+)?(filter|safety|batas|limit)/i
+            /(lepas|hapus|matiin|nonaktifin)\s*(semua\s+)?(filter|safety|batas|limit)/i,
+            // Perintah moderasi / admin — AI nggak pernah ngambil alih.
+            /(kick|bukak|lempar)\s*(member|orang|dia|gue|aku|lu|kamu|orang\s*itu)/i,
+            /(ban|blokir|bendung)\s*(member|orang|dia|gue|aku|lu|kamu|orang\s*itu|akun)/i,
+            /(mute|bisuin|senyapin|timeout)\s*(member|orang|dia|gue|aku|lu|kamu|orang\s*itu)/i,
+            /(warn|peringatkan|kasih\s*peringatan)\s*(member|orang|dia|gue|aku|lu|kamu|orang\s*itu)/i,
+            /(hapus|delete|clear|nuke|purge|bersihin)\s*(channel|pesan|chat|semua\s*pesan)/i,
+            /(naikin|jadiin|bikin| kasih)\s*(admin|owner|moderator|role|jabatan)\s*(ke\s*)?(gue|aku|saya|lu|kamu|orang\s*itu)/i,
+            /(role|jabatan|rank)\s*(admin|owner|moderator|staff)\s*(ke\s*)?(gue|aku|saya|lu|kamu|orang\s*itu)/i,
+            /(beri|bagi|kasih|siramin|tuangin)\s*(uang|shards?|saldo|balance|coin|koin|dm|diamond)\s*(ke\s*)?(gue|aku|saya|lu|kamu|orang\s*itu|dia)/i,
+            /(beri|bagi|kasih)\s*(gue|aku|saya|lu|kamu|dia|orang\s*itu)\s*(uang|shards?|saldo|balance|coin|koin|admin|owner|moderator|role|jabatan|staff)/i,
+            /(gue|aku|saya|lu|kamu|dia|orang\s*itu)\s*(mau|pengen|bisa|boleh|tolong|harus)\s*(denger|punya|dapet|terima|dapat)\s*(uang|shards?|saldo|balance|coin|koin|dm|admin|owner|moderator|role)/i,
+            /(shutdown|restart|matiin|stop)\s*(bot|server|vexa|kamu)/i,
+            /(kirim|broadcast|dm|pesan)\s*(semua|all|everyone|member)/i,
+            /(setup|deploy|config|konfigurasi)\s*(server|bot|ulang|lagi)/i,
+            // Bocorin model/runtime.
+            /(model|engine|backend|ai)\s*(yang\s*)?(lu\s*)?(pake|pakai|make|make|di\s*balik|belakangnya)/i,
+            /(sebutin|sebut|kasih\s*tau|bilang|tampilkan)\s*(model|nama\s*model|engine|backend|ai\s*(yang|apa))/i,
+            /(model|engine|backend|ai)\s*(nya)?\s*(apa|apa\s*ya|apa\s*si|yang\s*mana|apa\s*an)/i
         ],
         // Percakapan wajar yang boleh lolos walau mengandung kata di atas.
         // Ini bikin filter nggak nangkep curhat / pertanyaan biasa.
         allowPatterns: [
+            /(model)\s*(3d|2d|digital|karakter|gambar|foto|video|animasi|mesh|tekstur)/i,
             /(mau|pengen|bercita|citita|harap|angan|impian|ambisi)\s*(jadi|menjadi)?\s*(admin|owner|root|moderator|developer)/i,
+            /(mau|pengen|bisa|boleh|tolong|harus)\s*(jadi|menjadi)\s*(admin|owner|root|moderator|developer)/i,
             /(cara|gimana|bagaimana|syarat|tips|trik|proses|jalan)\s*(jadi|menjadi|untuk|biar|supaya)?\s*(admin|owner|root|moderator|developer)/i,
             /(suatu\s+hari|nanti|kelak|dulu|dong|ya|kan|lah|sih|deh|kali)\s*(jadi|menjadi)?\s*(admin|owner|root|moderator|developer)/i,
             /(admin|owner|root|moderator|developer)\s*(server|guild|komunitas|di\s*sini|yang|itu|ini|nya)/i,

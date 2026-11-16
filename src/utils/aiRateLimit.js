@@ -61,3 +61,30 @@ export function resetAiQuota(userId) {
         }
     }
 }
+
+/**
+ * Sisa kuota user di sebuah channel (tanpa mencatat hit baru).
+ * @returns {{ remaining: number, limit: number, used: number }}
+ */
+export function getAiQuota(userId, channelId) {
+
+    const key = String(userId);
+
+    if (key === String(AI_CONFIG.limits.ownerUserId)) {
+        return { remaining: Number.MAX_SAFE_INTEGER, limit: Number.MAX_SAFE_INTEGER, used: 0, owner: true };
+    }
+
+    const max = limitFor(channelId);
+    const window = AI_CONFIG.limits.windowMs;
+    const now = Date.now();
+    const bucketKey = `${key}:${String(channelId ?? "dm")}`;
+
+    const hits = (buckets.get(bucketKey) ?? []).filter(ts => now - ts < window);
+
+    return {
+        remaining: Math.max(max - hits.length, 0),
+        limit: max,
+        used: hits.length,
+        owner: false
+    };
+}

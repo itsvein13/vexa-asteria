@@ -47,6 +47,15 @@ const CONTENT = {
                 ]
             },
             {
+                title: "🤖 Vexa AI",
+                lines: [
+                    "`@Vexa <pertanyaan>` — tanya apa aja ke AI Vexa",
+                    "`/ai-status` — cek sisa kuota AI kamu",
+                    `Kuota: **${2} pesan** di <#1571692132496838779> per 24 jam, **1 pesan** di channel lain`,
+                    "Kick / ban / mute / role — nggak dilayanin AI, urusan staff"
+                ]
+            },
+            {
                 title: "🎫 Butuh Bantuan / Jasa?",
                 lines: [
                     "`/services` — lihat katalog jasa & starting price sebelum order",
@@ -126,6 +135,15 @@ const CONTENT = {
                     "Level up by chatting (level × 10 💎)",
                     "Invite people — hit an active-invite milestone for bonus Shards (`/referral-milestones`)",
                     "Admin events & giveaways"
+                ]
+            },
+            {
+                title: "🤖 Vexa AI",
+                lines: [
+                    "`@Vexa <question>` — ask Vexa's AI anything",
+                    "`/ai-status` — check your remaining AI quota",
+                    `Quota: **2 messages** in <#1571692132496838779> per 24h, **1 message** elsewhere`,
+                    "Kick / ban / mute / roles — AI won't do those, ask staff"
                 ]
             },
             {
