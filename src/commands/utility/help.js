@@ -91,7 +91,8 @@ const CONTENT = {
                 "`/lofi-setup` — voice channel jam Lofi Radio (WIB)",
                 "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — role reward per level",
                 "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — milestone Shards untuk inviter",
-                "`/service-price-set` `/service-price-remove` — atur harga jasa yang tampil di `/services`"
+                "`/service-price-set` `/service-price-remove` — atur harga jasa yang tampil di `/services`",
+                "`/ai-announce` — kirim announcement integrasi AI Vexa ke channel announcement"
             ]
         },
         adminTools: {
@@ -182,7 +183,8 @@ const CONTENT = {
                 "`/lofi-setup` — Lofi Radio voice channel clock (WIB)",
                 "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — per-level role rewards",
                 "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — Shards milestones for inviters",
-                "`/service-price-set` `/service-price-remove` — manage the prices shown in `/services`"
+                "`/service-price-set` `/service-price-remove` — manage the prices shown in `/services`",
+                "`/ai-announce` — post the Vexa AI integration announcement to an announcement channel"
             ]
         },
         adminTools: {
