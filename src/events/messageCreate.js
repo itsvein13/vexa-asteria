@@ -210,10 +210,10 @@ function handleOwnerCommand(message, client, prompt) {
     }
 
     // Kirim pesan ke channel lain — paling sering dibutuhin owner.
-    // Format yang dikenali:
-    //   kirim: teks           kirim ke #channel: teks
-    //   bilangin: teks        pesan: teks
-    //   suruh: teks           info: teks
+    // Format:
+    //   kirim <channelId>: teks     (channelId = angka, dari Copy ID)
+    //   kirim: teks                 (tanpa ID → ke #vexa-ai)
+    //   kirim teks                  (tanpa titik dua)
     const sent = matchSendCommand(lower);
 
     if (sent) {
@@ -241,30 +241,27 @@ function handleOwnerCommand(message, client, prompt) {
 
 /**
  * Cocokin prompt ke format perintah kirim pesan.
- * Balikin isi pesan kalau cocok, null kalau bukan perintah kirim.
+ * Balikin { body, channelId } kalau cocok, null kalau bukan.
+ * Channel diambil dari ID (angka), bukan nama — biar nggak ambigu
+ * di server yang channel-nya banyak.
  */
 function matchSendCommand(lower) {
 
-    // "kirim: teks" / "kirim ke #channel: teks"
-    const withColon = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\b\s*(?:ke\s+)?(?:#?[\w-]+)?\s*[:\-–]\s*(.+)$/);
-    if (withColon) return withColon[1];
+    const verb = "(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)";
 
-    // "kirim ke #channel teks" — wajib ada "ke" biar "kirim halo"
-    // nggak keanggap channel. Channel name dibatasi 2 kata; kalau
-    // ternyata 3+ kata, anggap channelless biar pesannya utuh.
-    const loose = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\b\s+ke\s+(?:#?[\w-]+(?:\s+[\w-]+)?)\s+(.+)$/);
-    if (loose) {
-        const maybeChannel = lower.slice(
-            lower.indexOf('ke') + 2,
-            lower.length - loose[1].length
-        ).trim();
-        // Channel name > 2 kata → kemungkinan besar bukan channel.
-        if (maybeChannel.split(/\s+/).filter(Boolean).length <= 2) return loose[1];
-    }
+    // "kirim <id>: teks" / "kirim <id> teks"
+    // ID Discord asli 17-19 digit. Threshold 6 biar ID pendek nggak
+    // keanggap teks, tapi ID beneran tetep kebaca.
+    const withId = lower.match(new RegExp(`^${verb}\\b\\s+(\\d{6,})\\s*[:\\-–]?\\s*(.+)$`));
+    if (withId) return { body: withId[2], channelId: withId[1] };
 
-    // "kirim teks" — tanpa titik dua dan tanpa channel.
-    const bare = lower.match(/^(?:suruh|kasih|kirim|bilang(?:in)?|pesan|info(?:in)?)\b\s+(.+)$/);
-    if (bare) return bare[1];
+    // "kirim: teks" / "kirim teks" — tanpa ID, nanti fallback ke #vexa-ai
+    const noId = lower.match(new RegExp(`^${verb}\\b\\s*[:\\-–]\\s*(.+)$`));
+    if (noId) return { body: noId[1], channelId: null };
+
+    // "kirim teks" — tanpa titik dua dan tanpa ID.
+    const bare = lower.match(new RegExp(`^${verb}\\b\\s+(.+)$`));
+    if (bare) return { body: bare[1], channelId: null };
 
     return null;
 
@@ -273,26 +270,31 @@ function matchSendCommand(lower) {
 /**
  * Kirim pesan owner ke channel tujuan, lalu konfirmasi.
  */
-function sendOwnerMessage(message, client, rawBody) {
+function sendOwnerMessage(message, client, sent) {
 
-    const targetChannel = message.mentions?.channels?.first?.()
-        ?? client.channels.cache.get(AI_CONFIG.channel.vexaAiChannelId);
+    const targetChannel = sent.channelId
+        ? client.channels.cache.get(sent.channelId)
+        : message.mentions?.channels?.first?.()
+            ?? client.channels.cache.get(AI_CONFIG.channel.vexaAiChannelId);
 
     if (!targetChannel?.isTextBased?.()) {
-        safeSend(message.channel, { content: "Channel tujuannya nggak ketemu, bro." });
+        safeSend(message.channel, {
+            content: "Channel tujuannya nggak ketemu, bro. Cek ID-nya."
+        });
         return true;
     }
 
-    const body = String(rawBody ?? "").trim().slice(0, 1900);
+    const body = String(sent.body ?? "").trim().slice(0, 1900);
 
-    if (!body) {
+    // Body yang cuma titik dua / strip / spasi = dianggap kosong.
+    if (!body || /^[:.\-–\s]+$/.test(body)) {
         safeSend(message.channel, { content: "Pesannya apa, bro?" });
         return true;
     }
 
     safeSend(targetChannel, { content: body });
 
-    safeSend(message.channel, { content: "Udah gue kirim." });
+    safeSend(message.channel, { content: `Udah gue kirim ke ${targetChannel}.` });
 
     return true;
 
