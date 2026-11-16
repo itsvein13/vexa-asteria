@@ -31,6 +31,10 @@ export default {
             return;
         }
 
+        // AI mention dihandle duluan, biar nggak kena return di bawah
+        // (cooldown XP bikin result null — AI jadi nggak pernah jalan).
+        await handleAiMention(message, client);
+
         const result = addMessageXP(message.author.id, message.guild.id);
 
         // null = lagi kena cooldown, ga dapet XP kali ini
@@ -65,9 +69,6 @@ export default {
             await safeSend(message.channel, { embeds: [embed] });
 
         }
-
-        // AI mention: @Vexa <pertanyaan>
-        await handleAiMention(message, client);
 
     }
 
