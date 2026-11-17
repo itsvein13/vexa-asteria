@@ -11,7 +11,7 @@ import { AI_CONFIG } from "../config/ai.config.js";
 import { checkAiQuota, getAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
-import { shouldRoastAsley, markRoastAsley } from "../utils/asleySlander.js";
+import { shouldRoast, markRoast } from "../utils/asleySlander.js";
 
 export default {
 
@@ -32,19 +32,21 @@ export default {
             return;
         }
 
-        // Sindiran buat Asley — 1x per 2 hari, di channel mana aja.
-        // Di-reply ke pesannya + mention dia. Hitungan baru dicatat
-        // kalau kirim sukses (markRoastAsley), biar gagal kirim nggak
-        // makan giliran.
-        if (shouldRoastAsley(message.author.id)) {
+        // Sindiran buat orang-orang yang dikenal — jatah per 2 hari,
+        // di channel mana aja. Di-reply ke pesannya + mention dia.
+        // Hitungan baru dicatat kalau kirim sukses, biar gagal kirim
+        // nggak makan giliran.
+        const roast = shouldRoast(message.author.id);
+
+        if (roast) {
 
             const sent = await safeSend(message.channel, {
-                content: AI_CONFIG.asley.text,
+                content: roast.text,
                 allowedMentions: { users: [message.author.id] },
                 reply: { messageReference: message.id }
             });
 
-            if (sent) markRoastAsley(message.author.id);
+            if (sent) markRoast(message.author.id);
 
         }
 
@@ -200,17 +202,32 @@ function handleOwnerCommand(message, client, prompt) {
 
     const lower = prompt.toLowerCase();
 
-    // Kasih tau Asley pantek — manual, nggak nunggu jadwal.
-    if (/\b(asley|asle)\b/.test(lower) && /(pantek|kejek|sindir|ingetin|roast)/.test(lower)) {
+    // Suruh kejek orang yang dikenal — manual, nggak nunggu jadwal.
+    // Contoh: "kejek asley", "kejek billson pantek"
+    const roastTargets = AI_CONFIG.roastTargets ?? [];
 
-        const target = message.mentions?.users?.first?.();
+    if (roastTargets.length) {
 
-        safeSend(message.channel, {
-            content: AI_CONFIG.asley.text,
-            allowedMentions: { users: target ? [target.id] : [] }
-        });
+        const names = roastTargets.map(t => t.name).filter(Boolean);
+        const namePattern = new RegExp(`\\b(${names.join("|")})\\b`, "i");
 
-        return true;
+        if (namePattern.test(lower) && /(pantek|kejek|sindir|ingetin|roast|ajg|garing)/.test(lower)) {
+
+            const target = message.mentions?.users?.first?.();
+
+            const known = target
+                ? roastTargets.find(t => String(t.userId) === String(target.id))
+                : roastTargets.find(t => new RegExp(`\\b${t.name}\\b`, "i").test(lower))
+                    ?? roastTargets[0];
+
+            safeSend(message.channel, {
+                content: known.text,
+                allowedMentions: { users: target ? [target.id] : [] }
+            });
+
+            return true;
+
+        }
 
     }
 

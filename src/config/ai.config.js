@@ -125,13 +125,22 @@ export const AI_CONFIG = {
         }
     },
 
-    asley: {
-        userId: "568255840797065235",
-        // Dikejek paling sering 1x per 2 hari.
-        windowMs: 2 * DAY,
-        // Isi pesannya. Mention-nya ditambahin terpisah di messageCreate.
-        text: "Bang Asley Puantek"
-    },
+    // Daftar orang yang "dikenal" Vexa — tiap orang punya jatah
+    // sindiran per windowMs. Dipicu pas dia kirim pesan, di channel
+    // mana aja, di-reply + mention.
+    roastTargets: [
+        {
+            userId: "568255840797065235",
+            name: "asley",
+            text: "Bang Asley Puantek"
+        },
+        {
+            userId: "917684312948744202",
+            name: "billson",
+            text: "Billson apaan si ajg garing pantek by asley"
+        }
+    ],
+    roastWindowMs: 2 * DAY,
 
     // Pesan pas limit user habis.
     limitMessage: (minutes) => {

@@ -1,36 +1,54 @@
 import { AI_CONFIG } from "../config/ai.config.js";
 
 /**
- * Sindiran buat Bang Asley — maksimal 1x per 2 hari, dipicu pas
- * dia kirim pesan (mention atau nggak), di channel mana aja.
+ * Sindiran buat orang-orang yang "dikenal" Vexa — dipicu pas dia
+ * kirim pesan (mention atau nggak), di channel mana aja.
  *
- * Hitungan baru dicatat SETELAH pesan berhasil terkirim, biar kirim
- * gagal (bot nggak punya izin) nggak makan giliran 2 hari.
+ * Tiap target punya jatah sendiri per roastWindowMs. Hitungan baru
+ * dicatat SETELAH pesan berhasil terkirim, biar kirim gagal (bot
+ * nggak punya izin) nggak makan giliran.
  */
 
 const hits = new Map();
 
-export function isAsley(userId) {
-    return String(userId ?? "") === AI_CONFIG.asley.userId;
+function findTarget(userId) {
+
+    const id = String(userId ?? "");
+
+    return AI_CONFIG.roastTargets?.find(t => String(t.userId) === id) ?? null;
+
+}
+
+/** Cari konfigurasi target dari userId. */
+export function getRoastTarget(userId) {
+    return findTarget(userId);
 }
 
 /**
- * Cek apakah Asley boleh dikejek sekarang. TANPA mencatat —
- * pemanggil harus panggil markRoastAsley() kalau kirim sukses.
+ * Cek apakah user ini boleh dikejek sekarang. TANPA mencatat —
+ * pemanggil harus panggil markRoast() kalau kirim sukses.
+ * @returns {object|null} konfigurasi target kalau boleh, null kalau nggak.
  */
-export function shouldRoastAsley(userId, now = Date.now()) {
+export function shouldRoast(userId, now = Date.now()) {
 
-    if (!isAsley(userId)) return false;
+    const target = findTarget(userId);
 
-    const window = AI_CONFIG.asley.windowMs;
+    if (!target) return null;
+
+    const window = AI_CONFIG.roastWindowMs;
     const last = hits.get(String(userId)) ?? 0;
 
-    return now - last >= window;
+    if (now - last < window) return null;
+
+    return target;
 
 }
 
-/** Catat bahwa Asley udah dikejek — panggil hanya kalau kirim sukses. */
-export function markRoastAsley(userId, now = Date.now()) {
+/** Catat bahwa user udah dikejek — panggil hanya kalau kirim sukses. */
+export function markRoast(userId, now = Date.now()) {
     hits.set(String(userId), now);
 }
 
+/** Backward-compat: nama lama biar import lama nggak error. */
+export const shouldRoastAsley = shouldRoast;
+export const markRoastAsley = markRoast;
