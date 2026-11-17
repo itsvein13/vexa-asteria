@@ -97,9 +97,10 @@ export default {
 
         let index = 0;
 
-        // Rotasi presence tiap 10 menit — batas aman Discord
-        // (presence di-rate-limit ~1x per menit).
-        const PRESENCE_INTERVAL_MS = 10 * 60 * 1000;
+        // Rotasi presence tiap 30 detik.
+        // Catatan: Discord rate-limit presence ~1x per menit, jadi
+        // update yang keburu bisa ditolak — efeknya kadang tiap ~60 detik.
+        const PRESENCE_INTERVAL_MS = 30 * 1000;
 
         async function updatePresence() {
 
