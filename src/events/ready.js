@@ -97,24 +97,27 @@ export default {
 
         let index = 0;
 
-        // Rotasi presence tiap 3 hari — biar nggak ngebosin.
-        const PRESENCE_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000;
+        // Rotasi presence tiap 10 menit — batas aman Discord
+        // (presence di-rate-limit ~1x per menit).
+        const PRESENCE_INTERVAL_MS = 10 * 60 * 1000;
 
         async function updatePresence() {
 
             const activities = [
-                "mencurahkan hati lewat status doang",
-                "sibuk ngusahain, hasilnya rata-rata",
-                "jatuh bangun, ya bangun lagi",
-                "pengennya istirahat, tapi ada aja",
-                "dengerin lagu yang sama, berulang",
-                "hidup itu antri, sabar itu kunci"
+                { name: "mencurahkan hati lewat status doang", type: ActivityType.Playing },
+                { name: "hidup segan, offline pun sayang", type: ActivityType.Playing },
+                { name: "sibuk (padahal enggak)", type: ActivityType.Watching },
+                { name: "jatuh bangun, ya bangun lagi", type: ActivityType.Playing },
+                { name: "pengennya istirahat, tapi ada aja", type: ActivityType.Playing },
+                { name: "dengerin lagu yang sama, berulang", type: ActivityType.Playing },
+                { name: "hidup itu antri, sabar itu kunci", type: ActivityType.Playing },
+                { name: "bang asle kenapa suka marah ya?", type: ActivityType.Watching },
+                { name: "Official Synd1cate Bot", type: ActivityType.Watching }
             ];
 
-            client.user.setActivity(
-                activities[index],
-                { type: ActivityType.Playing }
-            );
+            const current = activities[index];
+
+            client.user.setActivity(current.name, { type: current.type });
 
             index = (index + 1) % activities.length;
 
