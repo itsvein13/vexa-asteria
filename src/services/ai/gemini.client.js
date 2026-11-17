@@ -58,7 +58,7 @@ async function generate({ prompt, systemPrompt, signal }) {
 
         const detail = String(data?.error?.message ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, 200);
 
-        if (/429|rate limit|quota|resource has been exhausted/i.test(detail)) {
+        if (/429|rate limit|quota|resource has been exhausted|high demand|temporarily/i.test(detail)) {
             throw new AiError("QUOTA", "Kuota AI habis buat sekarang. Coba lagi nanti.");
         }
 

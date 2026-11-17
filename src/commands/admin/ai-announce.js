@@ -107,6 +107,15 @@ export default {
 
     async execute(interaction) {
 
+        // Defer dulu — kirim embed ke channel lain bisa molor >3 detik,
+        // kalau langsung reply nanti kena 10062 (Unknown interaction).
+        try {
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        } catch (error) {
+            console.warn(`⚠️ ai-announce deferReply gagal (${error.code ?? "UNKNOWN"})`);
+            return;
+        }
+
         const channel = interaction.options.getChannel("channel");
 
         const embed = new EmbedBuilder()
@@ -127,11 +136,10 @@ export default {
             embeds: [embed]
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             content: sent
                 ? `✅ Announcement terkirim ke ${channel}.`
-                : `⚠️ Gagal kirim ke ${channel} — cek permission bot di channel itu.`,
-            flags: MessageFlags.Ephemeral
+                : `⚠️ Gagal kirim ke ${channel} — cek permission bot di channel itu.`
         });
 
     }
