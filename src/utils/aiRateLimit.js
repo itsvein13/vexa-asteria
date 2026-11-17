@@ -1,6 +1,6 @@
 // Kuota per user, dibedakan per channel:
-// - #vexa-ai  → 2 pesan per 24 jam
-// - lainnya   → 1 pesan per 24 jam
+// - #vexa-ai  → 5 pesan per 24 jam
+// - lainnya   → 2 pesan per 24 jam
 // Owner bebas.
 
 import { AI_CONFIG } from "../config/ai.config.js";

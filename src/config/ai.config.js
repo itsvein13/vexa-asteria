@@ -16,8 +16,8 @@ export const AI_CONFIG = {
     apiKey: (process.env.GEMINI_API_KEY || "").trim(),
     model: (process.env.GEMINI_MODEL || "gemini-3.1-flash-lite").trim(),
 
-    // Channel khusus AI. Di sini user boleh nanya 2 pesan; di channel
-    // lain cuma 1.
+    // Channel khusus AI. Di sini user boleh nanya 5 pesan; di channel
+    // lain cuma 2.
     channel: {
         vexaAiChannelId: process.env.VEXA_AI_CHANNEL_ID || "1571692132496838779"
     },
@@ -32,9 +32,10 @@ export const AI_CONFIG = {
     limits: {
         // Batas jendela (dipakai buat hitung jam reset di pesan limit).
         windowMs: DAY,
-        // Kuota per user: 2 di #vexa-ai, 1 di channel lain.
-        vexaAiChannelLimit: 2,
-        otherChannelLimit: 1,
+        // Kuota per user: 5 di #vexa-ai, 2 di channel lain.
+        // Dihitung dari limit free tier Gemini (~500 request/hari).
+        vexaAiChannelLimit: 5,
+        otherChannelLimit: 2,
         // Owner bebas dari semua limit di atas.
         ownerUserId: process.env.VEXA_OWNER_ID || "429791056083550208",
         // Role yang dianggap owner (nurut perintah, tapi tetap dibatasi

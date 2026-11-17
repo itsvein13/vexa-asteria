@@ -11,7 +11,7 @@ import { AI_CONFIG } from "../config/ai.config.js";
 import { checkAiQuota, getAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
-import { shouldRoastAsley, asleyLine } from "../utils/asleySlander.js";
+import { shouldRoastAsley, markRoastAsley, asleyLine } from "../utils/asleySlander.js";
 
 export default {
 
@@ -33,11 +33,16 @@ export default {
         }
 
         // Sindiran buat Asley — 1x per minggu, di channel mana aja.
+        // Hitungan baru dicatat kalau kirim sukses (lihat markRoastAsley).
         if (shouldRoastAsley(message.author.id)) {
-            await safeSend(message.channel, {
+
+            const sent = await safeSend(message.channel, {
                 content: asleyLine(message.createdTimestamp),
                 allowedMentions: { parse: [] }
             });
+
+            if (sent) markRoastAsley(message.author.id);
+
         }
 
         // AI mention dihandle sebelum return XP di bawah (cooldown bikin null).
@@ -83,8 +88,8 @@ export default {
 };
 
 /**
- * Balas pesan yang nge-mention bot. Kuota: 2 pesan di #vexa-ai,
- * 1 pesan di channel lain, per 24 jam.
+ * Balas pesan yang nge-mention bot. Kuota: 5 pesan di #vexa-ai,
+ * 2 pesan di channel lain, per 24 jam.
  */
 async function handleAiMention(message, client) {
 
