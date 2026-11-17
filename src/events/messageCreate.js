@@ -11,7 +11,7 @@ import { AI_CONFIG } from "../config/ai.config.js";
 import { checkAiQuota, getAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
-import { shouldRoastAsley, markRoastAsley, asleyLine } from "../utils/asleySlander.js";
+import { shouldRoastAsley, markRoastAsley } from "../utils/asleySlander.js";
 
 export default {
 
@@ -32,13 +32,16 @@ export default {
             return;
         }
 
-        // Sindiran buat Asley — 1x per minggu, di channel mana aja.
-        // Hitungan baru dicatat kalau kirim sukses (lihat markRoastAsley).
+        // Sindiran buat Asley — 1x per 2 hari, di channel mana aja.
+        // Di-reply ke pesannya + mention dia. Hitungan baru dicatat
+        // kalau kirim sukses (markRoastAsley), biar gagal kirim nggak
+        // makan giliran.
         if (shouldRoastAsley(message.author.id)) {
 
             const sent = await safeSend(message.channel, {
-                content: asleyLine(message.createdTimestamp),
-                allowedMentions: { parse: [] }
+                content: AI_CONFIG.asley.text,
+                allowedMentions: { users: [message.author.id] },
+                reply: { messageReference: message.id }
             });
 
             if (sent) markRoastAsley(message.author.id);
@@ -200,14 +203,11 @@ function handleOwnerCommand(message, client, prompt) {
     // Kasih tau Asley pantek — manual, nggak nunggu jadwal.
     if (/\b(asley|asle)\b/.test(lower) && /(pantek|kejek|sindir|ingetin|roast)/.test(lower)) {
 
-        const line = asleyLine(Date.now() + message.id);
-
-        const target = message.mentions?.users?.first?.() ?? null;
-        const tag = target ? `<@${target.id}>` : "Bang Asley";
+        const target = message.mentions?.users?.first?.();
 
         safeSend(message.channel, {
-            content: `${tag} ${line}`,
-            allowedMentions: { parse: [] }
+            content: AI_CONFIG.asley.text,
+            allowedMentions: { users: target ? [target.id] : [] }
         });
 
         return true;

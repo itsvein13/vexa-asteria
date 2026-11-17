@@ -127,12 +127,10 @@ export const AI_CONFIG = {
 
     asley: {
         userId: "568255840797065235",
-        windowMs: 7 * DAY,
-        lines: [
-            "Asley Pantek",
-            "Asley apaan si pantek betul",
-            "Diemin aja bang asley emg pante"
-        ]
+        // Dikejek paling sering 1x per 2 hari.
+        windowMs: 2 * DAY,
+        // Isi pesannya. Mention-nya ditambahin terpisah di messageCreate.
+        text: "Bang Asley Puantek"
     },
 
     // Pesan pas limit user habis.

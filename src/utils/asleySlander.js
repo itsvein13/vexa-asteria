@@ -1,11 +1,11 @@
 import { AI_CONFIG } from "../config/ai.config.js";
 
 /**
- * Sindiran buat Bang Asley — maksimal 1x per 7 hari, dipicu pas
- * dia kirim pesan (mention atau nggak).
+ * Sindiran buat Bang Asley — maksimal 1x per 2 hari, dipicu pas
+ * dia kirim pesan (mention atau nggak), di channel mana aja.
  *
  * Hitungan baru dicatat SETELAH pesan berhasil terkirim, biar kirim
- * gagal (bot nggak punya izin) nggak makan giliran seminggu.
+ * gagal (bot nggak punya izin) nggak makan giliran 2 hari.
  */
 
 const hits = new Map();
@@ -34,11 +34,3 @@ export function markRoastAsley(userId, now = Date.now()) {
     hits.set(String(userId), now);
 }
 
-/** Pilih kalimat sindiran. Varian biar nggak monoton. */
-export function asleyLine(seed = 0) {
-
-    const lines = AI_CONFIG.asley.lines;
-    const index = Math.abs(Number(seed) || 0) % lines.length;
-
-    return lines[index];
-}
