@@ -1,13 +1,13 @@
 import { AI_CONFIG } from "../config/ai.config.js";
+import { AI_PANEL_TITLE } from "../commands/admin/ai-setup.js";
 
 /**
  * Bersihkan #vexa-ai: pesan user yang umurnya > 20 menit dihapus.
- * Panel pembuka Vexa (embed title "Vexa AI") disimpan.
+ * Panel pembuka Vexa (embed title persis AI_PANEL_TITLE) disimpan.
  */
 
 const CLEAN_INTERVAL_MS = 60 * 1000;      // cek tiap menit
 const MAX_DELETE_AGE_MS = 20 * 60 * 1000;  // hapus yang > 20 menit
-const STARTER_TITLE = "Vexa AI — aktif di sini";
 const MAX_DELETE_BATCH = 100;
 
 let started = false;
@@ -17,7 +17,7 @@ function isStarterPanel(message) {
     if (message.author?.bot !== true) return false;
 
     return message.embeds?.some(embed =>
-        String(embed.title ?? "").includes(STARTER_TITLE)
+        String(embed.title ?? "").trim() === AI_PANEL_TITLE
     ) ?? false;
 
 }

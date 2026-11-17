@@ -92,7 +92,8 @@ const CONTENT = {
                 "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — role reward per level",
                 "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — milestone Shards untuk inviter",
                 "`/service-price-set` `/service-price-remove` — atur harga jasa yang tampil di `/services`",
-                "`/ai-announce` — kirim announcement integrasi AI Vexa ke channel announcement"
+                "`/ai-announce` — kirim announcement integrasi AI Vexa ke channel announcement",
+                "`/ai-setup` — kirim panel pembuka AI ke channel (default: #vexa-ai)"
             ]
         },
         adminTools: {
@@ -184,7 +185,8 @@ const CONTENT = {
                 "`/level-roles-setup` `/level-role-add` `/level-role-remove` `/level-roles` — per-level role rewards",
                 "`/referral-rewards-setup` `/referral-milestone-add` `/referral-milestone-remove` — Shards milestones for inviters",
                 "`/service-price-set` `/service-price-remove` — manage the prices shown in `/services`",
-                "`/ai-announce` — post the Vexa AI integration announcement to an announcement channel"
+                "`/ai-announce` — post the Vexa AI integration announcement to an announcement channel",
+                "`/ai-setup` — post the AI starter panel to a channel (default: #vexa-ai)"
             ]
         },
         adminTools: {

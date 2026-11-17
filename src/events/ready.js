@@ -1,11 +1,35 @@
-import { ActivityType, EmbedBuilder } from "discord.js";
+import { ActivityType } from "discord.js";
 import { startClockUpdater } from "../utils/clockChannel.js";
 import { cacheGuildInvites } from "../utils/inviteCache.js";
 import { startAiChannelCleaner } from "../utils/aiChannel.js";
 import { AI_CONFIG } from "../config/ai.config.js";
+import { buildAiPanel, AI_PANEL_TITLE } from "../commands/admin/ai-setup.js";
 import safeSend from "../utils/safeSend.js";
 
 const GUILD_ID = process.env.GUILD_ID;
+
+/**
+ * Cek apakah panel AI masih ada di channel. Panel dicocokkan dari
+ * judulnya yang PERSIS — panel lama yang judulnya beda nggak blokir
+ * panel baru.
+ */
+async function aiPanelExists(channel, botId) {
+
+    try {
+
+        const existing = await channel.messages.fetch({ limit: 20 });
+
+        return existing.some(msg =>
+            msg.author?.id === botId &&
+            msg.embeds?.some(e => String(e.title ?? "").trim() === AI_PANEL_TITLE)
+        );
+
+    } catch {
+        // Nggak bisa baca histori — anggap belum ada.
+        return false;
+    }
+
+}
 
 /**
  * Panel pembuka di #vexa-ai — dikirim sekali kalau belum ada.
@@ -18,49 +42,9 @@ async function postAiStarter(client) {
 
     if (!channel?.isTextBased?.()) return;
 
-    // Cek apakah panel sudah ada — hindari spam tiap restart.
-    try {
+    if (await aiPanelExists(channel, client.user.id)) return;
 
-        const existing = await channel.messages.fetch({ limit: 20 });
-        const already = existing.some(msg => {
-            if (msg.author?.id !== client.user.id) return false;
-            if (msg.content?.includes("Vexa AI")) return true;
-            return msg.embeds?.some(e => String(e.title ?? "").includes("Vexa AI"));
-        });
-
-        if (already) return;
-
-    } catch {
-        // Nggak bisa baca histori — kirim aja, risiko dobel kecil.
-    }
-
-    const embed = new EmbedBuilder()
-        .setColor("#7C3AED")
-        .setTitle("🤖 Vexa AI — aktif di sini")
-        .setDescription(
-            [
-                "Gue Vexa, sekarang udah integrasi sama AI. Mentions gue buat nanya apa aja.",
-                "",
-                "**Cara pakai**",
-                "`@Vexa <pertanyaan>` — tanya apa aja, gue jawab.",
-                "",
-                "**Aturan main**",
-                `• Kuota **${AI_CONFIG.limits.vexaAiChannelLimit} pesan** per 24 jam di channel ini.`,
-                `• Di channel lain, **${AI_CONFIG.limits.otherChannelLimit} pesan** per 24 jam.`,
-                "• `/ai-status` buat cek sisa kuota kamu.",
-                "",
-                "**Yang nggak gue layani**",
-                "• Kick / ban / mute / warn member — itu urusan staff.",
-                "• Kasih role admin / owner / moderator.",
-                "• Atur Shards / ekonomi server.",
-                "• Pertanyaan soal model di balik gue — rahasia.",
-                "",
-                "Santai aja, gue di sini buat teman ngobrol."
-            ].join("\n")
-        )
-        .setFooter({ text: "Powered by Vexa" });
-
-    await safeSend(channel, { embeds: [embed] });
+    await safeSend(channel, { embeds: [buildAiPanel()] });
 
 }
 
