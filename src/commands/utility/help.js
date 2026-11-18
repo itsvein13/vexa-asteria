@@ -35,6 +35,7 @@ const CONTENT = {
                     "`/shop` — lihat katalog theme, role, dan badge",
                     "`/buy` — beli item (theme langsung terpasang)",
                     "`/gacha` — tarik gacha, dapet badge acak",
+                    "`/gacha-shards` — tarik Shards acak (ada jackpot!)",
                     "`/badge` — lihat & pasang badge aktif",
                     "`/theme` — ganti-ganti theme yang sudah kamu miliki"
                 ]
@@ -134,6 +135,7 @@ const CONTENT = {
                     "`/shop` — browse themes, roles, and badges",
                     "`/buy` — buy an item (themes equip instantly)",
                     "`/gacha` — pull the gacha for a random badge",
+                    "`/gacha-shards` — pull for random Shards (jackpot exists!)",
                     "`/badge` — view & equip your active badge",
                     "`/theme` — switch between themes you own"
                 ]
