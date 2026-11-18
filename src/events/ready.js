@@ -89,15 +89,18 @@ export default {
         async function updatePresence() {
 
             const activities = [
-                { name: "mencurahkan hati lewat status doang", type: ActivityType.Playing },
-                { name: "hidup segan, offline pun sayang", type: ActivityType.Playing },
-                { name: "sibuk (padahal enggak)", type: ActivityType.Watching },
-                { name: "jatuh bangun, ya bangun lagi", type: ActivityType.Playing },
-                { name: "pengennya istirahat, tapi ada aja", type: ActivityType.Playing },
-                { name: "dengerin lagu yang sama, berulang", type: ActivityType.Playing },
-                { name: "hidup itu antri, sabar itu kunci", type: ActivityType.Playing },
-                { name: "bang asle kenapa suka marah ya?", type: ActivityType.Watching },
-                { name: "Official Synd1cate Bot", type: ActivityType.Watching }
+                { name: "sibuk nggak sibuk", type: ActivityType.Watching },
+                { name: "lowkey standby", type: ActivityType.Playing },
+                { name: "nggak alih-alih, emang nggak", type: ActivityType.Watching },
+                { name: "gaskeun? gue masih di sini", type: ActivityType.Playing },
+                { name: "lagi mid, jangan ganggu", type: ActivityType.Watching },
+                { name: "chat lu nanti gue bales", type: ActivityType.Playing },
+                { name: "no cap, cuma standby", type: ActivityType.Playing },
+                { name: "mood tipis, ditipisin", type: ActivityType.Watching },
+                { name: "touch grass dulu", type: ActivityType.Playing },
+                { name: "lagi sok sibuk", type: ActivityType.Watching },
+                { name: "nggak rate rate, santai", type: ActivityType.Playing },
+                { name: "main character energy", type: ActivityType.Playing }
             ];
 
             const current = activities[index];

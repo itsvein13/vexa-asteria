@@ -4,9 +4,11 @@ import { AI_CONFIG } from "../config/ai.config.js";
  * Sindiran buat orang-orang yang "dikenal" Vexa — dipicu pas dia
  * kirim pesan (mention atau nggak), di channel mana aja.
  *
- * Tiap target punya jatah sendiri per roastWindowMs. Hitungan baru
- * dicatat SETELAH pesan berhasil terkirim, biar kirim gagal (bot
- * nggak punya izin) nggak makan giliran.
+ * Tiap target punya jatah sendiri per roastWindowMs, dan teksnya
+ * diambil acak dari `lines` biar nggak template banget.
+ *
+ * Hitungan baru dicatat SETELAH pesan berhasil terkirim, biar kirim
+ * gagal (bot nggak punya izin) nggak makan giliran.
  */
 
 const hits = new Map();
@@ -47,6 +49,22 @@ export function shouldRoast(userId, now = Date.now()) {
 /** Catat bahwa user udah dikejek — panggil hanya kalau kirim sukses. */
 export function markRoast(userId, now = Date.now()) {
     hits.set(String(userId), now);
+}
+
+/**
+ * Pilih satu teks sindiran dari target. Acak, tapi stabil per
+ * pesan kalau dikasih seed (biar nggak "kedip" kalau dipanggil 2x).
+ */
+export function roastLine(target, seed = Date.now()) {
+
+    const lines = Array.isArray(target?.lines) && target.lines.length
+        ? target.lines
+        : [target?.text ?? ""].filter(Boolean);
+
+    const index = Math.abs(Number(seed) || 0) % lines.length;
+
+    return lines[index];
+
 }
 
 /** Backward-compat: nama lama biar import lama nggak error. */

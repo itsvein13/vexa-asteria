@@ -11,7 +11,7 @@ import { AI_CONFIG } from "../config/ai.config.js";
 import { checkAiQuota, getAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
-import { shouldRoast, markRoast } from "../utils/asleySlander.js";
+import { shouldRoast, markRoast, roastLine } from "../utils/asleySlander.js";
 
 export default {
 
@@ -41,7 +41,7 @@ export default {
         if (roast) {
 
             const sent = await safeSend(message.channel, {
-                content: roast.text,
+                content: roastLine(roast, message.createdTimestamp),
                 allowedMentions: { users: [message.author.id] },
                 reply: { messageReference: message.id }
             });
@@ -221,7 +221,7 @@ function handleOwnerCommand(message, client, prompt) {
                     ?? roastTargets[0];
 
             safeSend(message.channel, {
-                content: known.text,
+                content: roastLine(known, message.createdTimestamp),
                 allowedMentions: { users: target ? [target.id] : [] }
             });
 
