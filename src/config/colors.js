@@ -4,9 +4,9 @@ const COLORS = {
 
     muted: "#CFCFCF",
 
-    accent: "#A855F7",
+    accent: "#F1EEE6",
 
-    divider: "#8B5CF6",
+    divider: "#F1EEE6",
 
     gold: "#FFD54F",
 

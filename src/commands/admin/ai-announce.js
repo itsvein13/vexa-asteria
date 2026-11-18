@@ -119,7 +119,7 @@ export default {
         const channel = interaction.options.getChannel("channel");
 
         const embed = new EmbedBuilder()
-            .setColor("#7C3AED")
+            .setColor("#F1EEE6")
             .setTitle("🤖 VEXA AI IS LIVE")
             .setDescription(ID_DESCRIPTION)
             .addFields(

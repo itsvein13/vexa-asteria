@@ -6,7 +6,7 @@ const EFFECTS = {
 
     divider: "rgba(255,255,255,0.08)",
 
-    glow: "#A855F7"
+    glow: "#F1EEE6"
 
 };
 

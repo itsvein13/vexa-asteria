@@ -16,7 +16,7 @@ export const AI_PANEL_TITLE = "🤖 Vexa AI — aktif di sini";
 export function buildAiPanel() {
 
     return new EmbedBuilder()
-        .setColor("#7C3AED")
+        .setColor("#F1EEE6")
         .setTitle(AI_PANEL_TITLE)
         .setDescription(
             [

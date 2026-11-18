@@ -16,7 +16,12 @@ export default {
         const hasGameRole = GAME_ROLE_IDS.some(id => member.roles.cache.has(id));
         if (!hasGameRole) {
             return interaction.reply({
-                content: "⚠️ Klaim role game kamu dulu di panel **Choose Your Roles** (pilih minimal 1 game) sebelum verify. Kalau sudah, klik Verify lagi.",
+                content:
+                    "⚠️ **Tunggu dulu!** Kamu belum bisa verify karena belum pilih **role game**.\n" +
+                    "Buka panel **Choose Your Roles** (dropdown 🎮 di channel **#role-menu**), pilih minimal 1 game, lalu balik ke sini dan klik **Verify** lagi ya.\n\n" +
+                    "— — —\n\n" +
+                    "⚠️ **Hold on!** You can't verify yet because you haven't picked a **game role**.\n" +
+                    "Open the **Choose Your Roles** panel (🎮 dropdown in **#role-menu**), pick at least 1 game, then come back and click **Verify** again.",
                 ephemeral: true
             });
         }

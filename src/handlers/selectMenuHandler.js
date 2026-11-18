@@ -23,7 +23,6 @@ export default async function loadSelectMenus(client) {
             const imported = await import(pathToFileURL(filePath));
 
             console.log(`📄 Loading: ${file}`);
-            console.log(imported);
 
             const menu = imported.default;
 

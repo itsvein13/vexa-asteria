@@ -9,7 +9,7 @@ const THEMES = {
 
     default: {
         id: "default",
-        name: "Asteria Purple",
+        name: "Asteria Cream",
         emoji: "🟣",
         palette: null // ikut tier
     },

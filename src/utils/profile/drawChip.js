@@ -22,7 +22,7 @@ export function drawChip(ctx, {
 
 }) {
 
-    const accent = tier?.color ?? "#A855F7";
+    const accent = tier?.color ?? "#F1EEE6";
     const border = tier?.border ?? "rgba(168,85,247,.3)";
 
     ctx.save();

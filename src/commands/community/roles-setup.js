@@ -18,16 +18,20 @@ export default {
     async execute(interaction) {
 
         const embed = new EmbedBuilder()
-            .setColor("#7C3AED")
+            .setColor("#F1EEE6")
             .setTitle("🎭 Choose Your Roles")
             .setDescription([
-                "Make **Synd1cate** feel like home.",
+                "Define your place within **Synd1cate.**",
                 "",
-                "Pick the games you play, choose your vibe, and let everyone know if you're a content creator.",
+                "Choose what you play, what you create, and what brings you here. Your roles shape how you connect with the people and projects that make up the archive.",
                 "",
-                "You can update your roles anytime from this panel."
+                "**• Games & Interests**",
+                "**• Community Identity**",
+                "**• Content Creator**",
+                "",
+                "_Your choices can be changed at any time._"
             ].join("\n"))
-            .setImage("https://cdn.discordapp.com/attachments/1406140289344602192/1524289546840440852/CHOOSE_ROLES.png?ex=6a4f34c3&is=6a4de343&hm=6c845d8106e622c7fc8c82edc6eaa9bea47cff72dee18b6c2950b056de56d68f&")
+            .setImage("https://cdn.discordapp.com/attachments/1406140289344602192/1543936177365843988/CHOOSE_ROLES.png?ex=6a96ae1d&is=6a955c9d&hm=ce31c2cb5f0b720f5b595534f266f7fbd6db9941540f2d70b973c368b4f30f96&")
             .setFooter({
                 text: "Powered by Vexa"
             });

@@ -1,8 +1,11 @@
 import roles from "../config/roles.js";
 
 // Role utama yang saling eksklusif — satu member cuma boleh pegang satu.
-// Urutan array = prioritas saat cabut otomatis: STREAMER > LADIES > WANDERER.
+// Urutan array = prioritas saat cabut otomatis: VTUBER = STREAMER > LADIES > WANDERER.
+// (VTUBER setara Streamer, keduanya di atas LADIES & WANDERER. Kalau user pegang
+//  dua role dengan prioritas sama, yang disebut duluan di array ini yang dipertahankan.)
 const MAIN_ROLES = [
+    roles.VTUBER,
     roles.STREAMER,
     roles.LADIES,
     roles.WANDERER

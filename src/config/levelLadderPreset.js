@@ -9,7 +9,7 @@
  * /level-role-remove tanpa perlu redeploy kode.
  */
 const LEVEL_LADDER_PRESET = [
-    { level: 5,  label: "Rookie",  emoji: "🔰", color: "#A855F7" },
+    { level: 5,  label: "Rookie",  emoji: "🔰", color: "#F1EEE6" },
     { level: 10, label: "Adept",   emoji: "⚔️", color: "#B96FD5" },
     { level: 15, label: "Veteran", emoji: "🛡️", color: "#CB88B4" },
     { level: 20, label: "Elite",   emoji: "🔷", color: "#DCA292" },

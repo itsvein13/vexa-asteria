@@ -1,6 +1,12 @@
 import ROLES from "../config/roles.js";
 
 export function getMainRole(member) {
+    if (member.roles.cache.has(ROLES.VTUBER))
+        return "🎭 VTuber";
+    if (member.roles.cache.has(ROLES.STREAMER))
+        return "🔴 Streamer";
+    if (member.roles.cache.has(ROLES.LADIES))
+        return "💗 Ladies";
     if (member.roles.cache.has(ROLES.WANDERER))
         return "🏹 Wanderer";
 

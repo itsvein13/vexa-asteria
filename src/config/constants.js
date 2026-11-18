@@ -1,4 +1,4 @@
-export const EMBED_COLOR = "#7C3AED";
+export const EMBED_COLOR = "#F1EEE6";
 
 export const EMBED_FOOTER = {
     text: "Powered by Vexa"

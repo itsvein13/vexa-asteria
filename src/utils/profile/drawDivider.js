@@ -4,7 +4,7 @@ export function drawDivider(ctx, x, y, width = 220) {
 
     ctx.beginPath();
 
-    ctx.strokeStyle = "#8B5CF6";
+    ctx.strokeStyle = "#F1EEE6";
     ctx.globalAlpha = 0.35;
     ctx.lineWidth = 2;
 

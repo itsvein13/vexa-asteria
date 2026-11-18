@@ -3,7 +3,7 @@ import ROLES from "./roles.js";
 /**
  * Rarity/tier system — card treatment (accent color, glow, label)
  * driven by the member's actual role, like a trading-card rarity.
- * Priority: Overlord > Streamer > Ladies > Wanderer > Initiate.
+ * Priority: Overlord > Vtuber = Streamer > Ladies > Wanderer > Initiate.
  */
 const TIERS = {
 
@@ -23,6 +23,14 @@ const TIERS = {
         border: "rgba(251,69,112,0.4)"
     },
 
+    vtuber: {
+        label: "VTUBER",
+        color: "#C77DFF",
+        glow: "#B14DFF",
+        soft: "rgba(199,125,255,0.14)",
+        border: "rgba(199,125,255,0.4)"
+    },
+
     ladies: {
         label: "LADIES",
         color: "#FF8FD8",
@@ -33,10 +41,10 @@ const TIERS = {
 
     rare: {
         label: "WANDERER",
-        color: "#A855F7",
-        glow: "#C084FC",
-        soft: "rgba(168,85,247,0.14)",
-        border: "rgba(168,85,247,0.4)"
+        color: "#F1EEE6",
+        glow: "#F1EEE6",
+        soft: "rgba(241,238,230,0.14)",
+        border: "rgba(241,238,230,0.4)"
     },
 
     common: {
@@ -54,6 +62,7 @@ export function getTier(member) {
     const roles = member.roles.cache;
 
     if (roles.has(ROLES.OVERLORD)) return TIERS.legendary;
+    if (roles.has(ROLES.VTUBER)) return TIERS.vtuber;
     if (roles.has(ROLES.STREAMER)) return TIERS.epic;
     if (roles.has(ROLES.LADIES)) return TIERS.ladies;
     if (roles.has(ROLES.WANDERER)) return TIERS.rare;

@@ -28,7 +28,7 @@ export default {
         .addStringOption(option =>
             option
                 .setName("color")
-                .setDescription("Hex color (e.g. #A855F7). Default: Vexa purple.")
+                .setDescription("Hex color (e.g. #F1EEE6). Default: Vexa cream.")
                 .setRequired(false)
         ),
 
@@ -36,7 +36,7 @@ export default {
 
         const level = interaction.options.getInteger("level");
         const name = interaction.options.getString("name");
-        const color = interaction.options.getString("color") ?? "#A855F7";
+        const color = interaction.options.getString("color") ?? "#F1EEE6";
 
         let role;
 

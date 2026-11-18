@@ -16,7 +16,7 @@ export default {
     async execute(interaction) {
 
         const embed = new EmbedBuilder()
-            .setColor("#7C3AED")
+            .setColor("#F1EEE6")
             .setTitle("❓ Frequently Asked Questions")
             .setDescription([
                 "Got a question? Chances are you'll find the answer below.",
