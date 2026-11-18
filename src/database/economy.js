@@ -103,3 +103,20 @@ export const purchaseItem = db.transaction((userId, guildId, itemId, cost) => {
     return { ok: true, balance: getBalance(userId, guildId) };
 
 });
+
+/**
+ * Potong saldo aja (buat gacha / layanan yang nggak butuh item).
+ * User unlimited tetep bisa walau saldo kurang.
+ * Balikin { ok, balance }.
+ */
+export function spendShards(userId, guildId, amount) {
+
+    const result = spendStmt.run({ userId, guildId, cost: amount });
+
+    if (result.changes === 0) {
+        return { ok: false, balance: getBalance(userId, guildId) };
+    }
+
+    return { ok: true, balance: getBalance(userId, guildId) };
+
+}

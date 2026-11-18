@@ -32,8 +32,10 @@ const CONTENT = {
                 title: "💎 Economy",
                 lines: [
                     "`/balance` — cek saldo Shards",
-                    "`/shop` — lihat katalog theme profile card",
+                    "`/shop` — lihat katalog theme, role, dan badge",
                     "`/buy` — beli item (theme langsung terpasang)",
+                    "`/gacha` — tarik gacha, dapet badge acak",
+                    "`/badge` — lihat & pasang badge aktif",
                     "`/theme` — ganti-ganti theme yang sudah kamu miliki"
                 ]
             },
@@ -104,6 +106,8 @@ const CONTENT = {
                 "`/give-shards` — beri/kurangi Shards member",
                 "`/giveaway-shards` — bagi Shards acak ke member aktif",
                 "`/owner-shards` — set Shards ∞ buat owner",
+                "`/shop-role-add` — jual role buat Shards",
+                "`/shop-badge-add` — tambah badge ke gacha",
                 "`/remove-initiate` — lepas role Initiate massal",
                 "`/stats` — statistik aktivitas & economy server",
                 "`/setup-status` — checklist command `-setup` mana yang udah/belum diatur"
@@ -127,8 +131,10 @@ const CONTENT = {
                 title: "💎 Economy",
                 lines: [
                     "`/balance` — check your Shards balance",
-                    "`/shop` — browse profile card themes",
+                    "`/shop` — browse themes, roles, and badges",
                     "`/buy` — buy an item (themes equip instantly)",
+                    "`/gacha` — pull the gacha for a random badge",
+                    "`/badge` — view & equip your active badge",
                     "`/theme` — switch between themes you own"
                 ]
             },
@@ -199,6 +205,8 @@ const CONTENT = {
                 "`/give-shards` — give/deduct a member's Shards",
                 "`/giveaway-shards` — randomly give Shards to active members",
                 "`/owner-shards` — set ∞ Shards for the owner",
+                "`/shop-role-add` — sell a role for Shards",
+                "`/shop-badge-add` — add a badge to the gacha",
                 "`/remove-initiate` — bulk-remove the Initiate role",
                 "`/stats` — server activity & economy statistics",
                 "`/setup-status` — checklist of which `-setup` commands are done/missing"

@@ -266,4 +266,44 @@ if (!economyColumns.includes("unlimited")) {
     console.log("📦 Migrasi: kolom 'unlimited' ditambahkan ke tabel economy");
 }
 
+// Migrasi: katalog role + badge yang bisa dibeli di shop.
+// Data member lama nggak berubah — cuma tabel baru.
+db.exec(`
+    CREATE TABLE IF NOT EXISTS shop_roles (
+        guild_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
+        role_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        emoji TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
+        price INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, item_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS shop_badges (
+        guild_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        emoji TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
+        price INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (guild_id, item_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS owned_badges (
+        user_id TEXT NOT NULL,
+        guild_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
+        acquired_at INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (user_id, guild_id, item_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS active_badge (
+        user_id TEXT NOT NULL,
+        guild_id TEXT NOT NULL,
+        badge_id TEXT,
+        PRIMARY KEY (user_id, guild_id)
+    );
+`);
+
 export default db;
