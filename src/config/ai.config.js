@@ -160,6 +160,22 @@ export const AI_CONFIG = {
     // 1x seminggu per orang.
     roastWindowMs: 7 * DAY,
 
+    // Trigger kata kunci: Billson ngetik "apaa"/"apaan" -> Vexa bales
+    // langsung (nggak nunggu jadwal roast). Cooldown biar nggak numpuk.
+    keywordRoasts: [
+        {
+            userId: "917684312948744202",
+            name: "billson",
+            keywords: ["apaa", "apaan", "apaaan", "apah"],
+            lines: [
+                "Apaantat ya anjg lu tai",
+                "apaaan? apaan tuh",
+                "lu tanya apaan? anjg"
+            ]
+        }
+    ],
+    keywordRoastCooldownMs: 30 * 1000,
+
     // Pesan pas limit user habis.
     limitMessage: (minutes) => {
         const rounded = Math.max(1, Math.round(minutes));

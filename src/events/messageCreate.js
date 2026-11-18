@@ -12,6 +12,7 @@ import { checkAiQuota, getAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
 import { shouldRoast, markRoast, roastLine } from "../utils/asleySlander.js";
+import { matchKeywordRoast } from "../utils/keywordRoast.js";
 
 export default {
 
@@ -32,8 +33,19 @@ export default {
             return;
         }
 
-        // Sindiran buat orang-orang yang dikenal — jatah per 2 hari,
-        // di channel mana aja. Di-reply ke pesannya + mention dia.
+        // Balasan kata kunci — Billson ngetik "apaa"/"apaan" -> langsung
+        // dibalas (nggak nunggu jadwal). Cooldown biar nggak numpuk.
+        const kw = matchKeywordRoast(message);
+
+        if (kw) {
+            await safeSend(message.channel, {
+                content: kw.line,
+                allowedMentions: { users: [message.author.id] },
+                reply: { messageReference: message.id }
+            });
+        }
+
+        // Sindiran jadwal — 1x seminggu, di channel mana aja.
         // Hitungan baru dicatat kalau kirim sukses, biar gagal kirim
         // nggak makan giliran.
         const roast = shouldRoast(message.author.id);
