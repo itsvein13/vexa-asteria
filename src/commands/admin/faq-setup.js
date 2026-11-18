@@ -49,7 +49,7 @@ export default {
             ].join("\n"))
 
             // ===== FAQ Banner =====
-            .setImage("https://cdn.discordapp.com/attachments/1406140289344602192/1524289547280846878/FAQ.png?ex=6a4f34c4&is=6a4de344&hm=3c35ffd3ec8b2a4fd3e98ca088a6a67f68058bc44a048d17b12ce320ceee8675&")
+            .setImage("https://cdn.discordapp.com/attachments/1406140289344602192/1572467240098603138/FAQ.png?ex=6afe79bd&is=6afd283d&hm=492959ff897cfd1129eeaa849542e14fb8701307eea638f992b103350a87bbfc&")
 
             .setFooter({
                 text: "Powered by Vexa"
