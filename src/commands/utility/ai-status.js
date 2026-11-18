@@ -13,7 +13,7 @@ export default {
 
     async execute(interaction) {
 
-        const quota = getAiQuota(interaction.user.id, interaction.channelId);
+        const quota = getAiQuota(interaction.user.id, interaction.channelId, interaction.member);
 
         const embed = new EmbedBuilder()
             .setColor(EMBED_COLOR)
@@ -21,7 +21,9 @@ export default {
             .setDescription(
                 quota.owner
                     ? "Kamu owner — kuota nggak dibatasi."
-                    : `Sisa kuota kamu di channel ini: **${quota.remaining}** dari **${quota.limit}** pesan.`
+                    : quota.vip
+                        ? "Kamu VIP — kuota AI nggak dibatasi."
+                        : `Sisa kuota kamu di channel ini: **${quota.remaining}** dari **${quota.limit}** pesan.`
             )
             .addFields(
                 {
@@ -31,8 +33,8 @@ export default {
                 },
                 {
                     name: "Jatah",
-                    value: quota.owner
-                        ? "∞ (owner)"
+                    value: quota.owner || quota.vip
+                        ? "∞ (bebas)"
                         : `${quota.used}/${quota.limit} terpakai`,
                     inline: true
                 },

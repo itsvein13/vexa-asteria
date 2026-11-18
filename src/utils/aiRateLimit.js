@@ -1,7 +1,7 @@
 // Kuota per user, dibedakan per channel:
 // - #vexa-ai  → 5 pesan per 24 jam
 // - lainnya   → 2 pesan per 24 jam
-// Owner bebas.
+// Owner dan role VIP bebas.
 
 import { AI_CONFIG } from "../config/ai.config.js";
 
@@ -9,6 +9,24 @@ const buckets = new Map();
 
 export function isVexaAiChannel(channelId) {
     return String(channelId ?? "") === String(AI_CONFIG.channel.vexaAiChannelId);
+}
+
+/**
+ * Cek apakah user punya role VIP (bypass kuota). Terima member
+ * Discord kalau ada; kalau nggak, cuma userId yang dipakai.
+ */
+function hasVipRole(userId, member) {
+
+    const vipIds = AI_CONFIG.limits.vipRoleIds ?? [];
+
+    if (vipIds.length === 0) return false;
+
+    const owned = new Set(
+        (member?.roles?.cache?.map?.(role => String(role.id)) ?? [])
+    );
+
+    return vipIds.some(id => owned.has(String(id)));
+
 }
 
 function limitFor(channelId) {
@@ -21,11 +39,15 @@ function limitFor(channelId) {
  * Cek + catat kuota user di channel tertentu.
  * @returns {{ allowed: boolean, retryAfterMs: number, remaining: number }}
  */
-export function checkAiQuota(userId, channelId) {
+export function checkAiQuota(userId, channelId, member = null) {
 
     const key = String(userId);
 
     if (key === String(AI_CONFIG.limits.ownerUserId)) {
+        return { allowed: true, retryAfterMs: 0, remaining: Number.MAX_SAFE_INTEGER };
+    }
+
+    if (hasVipRole(key, member)) {
         return { allowed: true, retryAfterMs: 0, remaining: Number.MAX_SAFE_INTEGER };
     }
 
@@ -66,12 +88,16 @@ export function resetAiQuota(userId) {
  * Sisa kuota user di sebuah channel (tanpa mencatat hit baru).
  * @returns {{ remaining: number, limit: number, used: number }}
  */
-export function getAiQuota(userId, channelId) {
+export function getAiQuota(userId, channelId, member = null) {
 
     const key = String(userId);
 
     if (key === String(AI_CONFIG.limits.ownerUserId)) {
         return { remaining: Number.MAX_SAFE_INTEGER, limit: Number.MAX_SAFE_INTEGER, used: 0, owner: true };
+    }
+
+    if (hasVipRole(key, member)) {
+        return { remaining: Number.MAX_SAFE_INTEGER, limit: Number.MAX_SAFE_INTEGER, used: 0, owner: false, vip: true };
     }
 
     const max = limitFor(channelId);

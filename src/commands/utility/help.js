@@ -52,7 +52,7 @@ const CONTENT = {
                 title: "🤖 Vexa AI",
                 lines: [
                     "`@Vexa <pertanyaan>` — tanya apa aja ke AI Vexa",
-                    "`/ai-status` — cek sisa kuota AI kamu",
+                    "`/ai-status` — cek sisa kuota AI kamu (owner & VIP: ∞)",
                     `Kuota: **5 pesan** di <#1571692132496838779> per 24 jam, **2 pesan** di channel lain`,
                     "Kick / ban / mute / role — nggak dilayanin AI, urusan staff"
                 ]
@@ -151,7 +151,7 @@ const CONTENT = {
                 title: "🤖 Vexa AI",
                 lines: [
                     "`@Vexa <question>` — ask Vexa's AI anything",
-                    "`/ai-status` — check your remaining AI quota",
+                    "`/ai-status` — check your AI quota (owner & VIP: ∞)",
                     `Quota: **5 messages** in <#1571692132496838779> per 24h, **2 messages** elsewhere`,
                     "Kick / ban / mute / roles — AI won't do those, ask staff"
                 ]

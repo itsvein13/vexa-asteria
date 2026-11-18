@@ -131,10 +131,10 @@ async function handleAiMention(message, client) {
 
     }
 
-    // Kuota per user (owner bebas).
+    // Kuota per user (owner & VIP bebas).
     const quota = owner
         ? { allowed: true, retryAfterMs: 0, remaining: Infinity }
-        : checkAiQuota(message.author.id, message.channelId);
+        : checkAiQuota(message.author.id, message.channelId, message.member);
 
     if (!quota.allowed) {
         await safeSend(message.channel, {

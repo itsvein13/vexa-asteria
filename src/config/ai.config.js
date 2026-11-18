@@ -44,6 +44,11 @@ export const AI_CONFIG = {
             .split(",")
             .map(id => id.trim())
             .filter(Boolean),
+        // Role VIP (Mythical/Radiant) — bebas kuota AI juga.
+        vipRoleIds: (process.env.VEXA_VIP_ROLE_IDS || "1572439263016910979,1572439908872884234")
+            .split(",")
+            .map(id => id.trim())
+            .filter(Boolean),
         // Jeda biar nggak ada pesan numpuk.
         userCooldownMs: 8 * 1000,
         maxPromptChars: 600,
