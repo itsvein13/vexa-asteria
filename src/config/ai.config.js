@@ -138,26 +138,27 @@ export const AI_CONFIG = {
             userId: "568255840797065235",
             name: "asley",
             lines: [
-                "Bang Asley Puantek",
-                "Asley apaan si, pantek betul",
-                "Bang Asley emg pante",
-                "Asley lu ternyata segini doang",
-                "hadeh bang asley mulu lu"
+                "garing bet lu sley",
+                "iya sley",
+                "pantek lu sley",
+                "yapping mulu sley",
+                "udahan yappingnya?"
             ]
         },
         {
             userId: "917684312948744202",
             name: "billson",
             lines: [
-                "Billson apaan si ajg garing pantek by asley",
-                "Billson garing banget sih lu",
-                "Billson lagi nyari perhatian ya",
-                "puantek billson meluncur",
-                "billson sok suci, nyatanya"
+                "garing bet",
+                "so a6",
+                "dasar termul",
+                "billson puantek",
+                "diemin aja lg monolog dia wkwk"
             ]
         }
     ],
-    roastWindowMs: 2 * DAY,
+    // 1x seminggu per orang.
+    roastWindowMs: 7 * DAY,
 
     // Pesan pas limit user habis.
     limitMessage: (minutes) => {
