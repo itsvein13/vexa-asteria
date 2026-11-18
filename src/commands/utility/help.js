@@ -102,6 +102,8 @@ const CONTENT = {
                 "`/sync-rewards` — apply role reward level ke semua member",
                 "`/referral-sync` — cek ulang milestone referral semua inviter",
                 "`/give-shards` — beri/kurangi Shards member",
+                "`/giveaway-shards` — bagi Shards acak ke member aktif",
+                "`/owner-shards` — set Shards ∞ buat owner",
                 "`/remove-initiate` — lepas role Initiate massal",
                 "`/stats` — statistik aktivitas & economy server",
                 "`/setup-status` — checklist command `-setup` mana yang udah/belum diatur"
@@ -195,6 +197,8 @@ const CONTENT = {
                 "`/sync-rewards` — apply level role rewards to all members",
                 "`/referral-sync` — re-check every inviter against the milestone ladder",
                 "`/give-shards` — give/deduct a member's Shards",
+                "`/giveaway-shards` — randomly give Shards to active members",
+                "`/owner-shards` — set ∞ Shards for the owner",
                 "`/remove-initiate` — bulk-remove the Initiate role",
                 "`/stats` — server activity & economy statistics",
                 "`/setup-status` — checklist of which `-setup` commands are done/missing"

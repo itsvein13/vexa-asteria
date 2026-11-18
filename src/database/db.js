@@ -57,6 +57,7 @@ db.exec(`
         user_id TEXT NOT NULL,
         guild_id TEXT NOT NULL,
         balance INTEGER NOT NULL DEFAULT 0,
+        unlimited INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (user_id, guild_id)
     );
 
@@ -252,6 +253,17 @@ if (!ticketColumns.includes("category")) {
 if (!ticketColumns.includes("order_status")) {
     db.exec("ALTER TABLE tickets ADD COLUMN order_status TEXT");
     console.log("📦 Migrasi: kolom 'order_status' ditambahkan ke tabel tickets");
+}
+
+// Migrasi: kolom unlimited di economy. Buat DB lama, kolom ini belum
+// ada; nambahin kolom TIDAK ngubah baris member yang sudah ada
+// (default 0 = nggak unlimited). Cek dulu biar aman kalau dijalankan
+// berkali-kali.
+const economyColumns = db.prepare("PRAGMA table_info(economy)").all().map(c => c.name);
+
+if (!economyColumns.includes("unlimited")) {
+    db.exec("ALTER TABLE economy ADD COLUMN unlimited INTEGER NOT NULL DEFAULT 0");
+    console.log("📦 Migrasi: kolom 'unlimited' ditambahkan ke tabel economy");
 }
 
 export default db;

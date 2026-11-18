@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import { getBalance, getInventory } from "../../database/economy.js";
+import { getBalance, getInventory, isUnlimited } from "../../database/economy.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 
 export default {
@@ -18,6 +18,7 @@ export default {
 
         const user = interaction.options.getUser("member") ?? interaction.user;
         const balance = getBalance(user.id, interaction.guild.id);
+        const unlimited = isUnlimited(user.id, interaction.guild.id);
         const items = getInventory(user.id, interaction.guild.id);
 
         const embed = new EmbedBuilder()
@@ -27,7 +28,9 @@ export default {
                 iconURL: user.displayAvatarURL({ extension: "png", size: 128 })
             })
             .setDescription([
-                `💎 **${balance.toLocaleString()} Shards**`,
+                unlimited
+                    ? "💎 **∞ Shards** — unlimited"
+                    : `💎 **${balance.toLocaleString()} Shards**`,
                 `🎒 Item dimiliki: **${items.length}**`
             ].join("\n"))
             .setFooter(EMBED_FOOTER);

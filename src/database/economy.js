@@ -4,6 +4,20 @@ const getBalanceStmt = db.prepare(
     "SELECT balance FROM economy WHERE user_id = ? AND guild_id = ?"
 );
 
+const isUnlimitedStmt = db.prepare(
+    "SELECT unlimited FROM economy WHERE user_id = ? AND guild_id = ?"
+);
+
+// Flag unlimited dicatat bareng baris economy user. Kalau barisnya
+// belum ada, bikin dulu (balance 0) supaya ALTER TABLE di db.js
+// ngeliat kolomnya.
+const unlimitedStmt = db.prepare(`
+    INSERT INTO economy (user_id, guild_id, balance, unlimited)
+    VALUES (@userId, @guildId, 0, @unlimited)
+    ON CONFLICT(user_id, guild_id)
+    DO UPDATE SET unlimited = @unlimited
+`);
+
 const addStmt = db.prepare(`
     INSERT INTO economy (user_id, guild_id, balance)
     VALUES (@userId, @guildId, @amount)
@@ -11,12 +25,14 @@ const addStmt = db.prepare(`
     DO UPDATE SET balance = balance + @amount
 `);
 
-// UPDATE bersyarat: cuma jalan kalau saldo cukup → atomik,
-// ga ada window antara "cek saldo" dan "potong saldo".
+// Potong saldo → atomik, ga ada window antara "cek saldo" dan
+// "potong saldo". User unlimited tetep bisa beli walau saldonya
+// kurang (flag di kolom economy.unlimited).
 const spendStmt = db.prepare(`
     UPDATE economy
     SET balance = balance - @cost
-    WHERE user_id = @userId AND guild_id = @guildId AND balance >= @cost
+    WHERE user_id = @userId AND guild_id = @guildId
+      AND (balance >= @cost OR unlimited = 1)
 `);
 
 const ownStmt = db.prepare(
@@ -36,10 +52,23 @@ export function getBalance(userId, guildId) {
     return getBalanceStmt.get(userId, guildId)?.balance ?? 0;
 }
 
+/** Cek apakah user ini punya saldo unlimited (owner). */
+export function isUnlimited(userId, guildId) {
+    return isUnlimitedStmt.get(userId, guildId)?.unlimited === 1;
+}
+
 /** Tambah Shards (daily, level-up, admin). Balikin saldo baru. */
 export function addShards(userId, guildId, amount) {
     addStmt.run({ userId, guildId, amount });
     return getBalance(userId, guildId);
+}
+
+/**
+ * Set/buka flag unlimited buat user ini. Hanya owner yang boleh.
+ */
+export function setUnlimited(userId, guildId, on) {
+    unlimitedStmt.run({ userId, guildId, unlimited: on ? 1 : 0 });
+    return isUnlimited(userId, guildId);
 }
 
 export function ownsItem(userId, guildId, itemId) {
