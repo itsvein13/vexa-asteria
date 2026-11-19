@@ -155,6 +155,15 @@ export const AI_CONFIG = {
                 "billson puantek",
                 "diemin aja lg monolog dia wkwk"
             ]
+        },
+        {
+            userId: "760063132700770336",
+            name: "sipu",
+            lines: [
+                "ada sipu bubar aja cok",
+                "sipu pante gajelas",
+                "garing bet sipu jing"
+            ]
         }
     ],
     // 1x seminggu per orang.
