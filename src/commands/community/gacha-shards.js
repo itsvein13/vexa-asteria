@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { spendShards, addShards } from "../../database/economy.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 import COLORS from "../../config/colors.js";
@@ -61,7 +61,7 @@ export default {
                 .setColor(COLORS.danger)
                 .setDescription(`❌ Saldo kurang — tarikan butuh 💎 **${price.toLocaleString()}**, saldomu **${paid.balance.toLocaleString()}**.`)
                 .setFooter(EMBED_FOOTER);
-            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+            return interaction.reply({ embeds: [embed] });
         }
 
         const result = roll();
@@ -79,27 +79,18 @@ export default {
             ].join("\n"))
             .setFooter(EMBED_FOOTER);
 
-        await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+        await interaction.reply({ embeds: [embed] });
 
-        // Jackpot = pengumuman publik, biar rame. Nggak ephemeral.
+        // Kalau jackpot, embed di atas udah publik — tambah pengumuman
+        // singkat biar makin rame (tanpa kirim embed ke-2 yang nyaris sama).
         if (result.jackpot) {
 
             const channel = interaction.channel;
 
             if (channel?.isTextBased?.()) {
-
-                const announcement = new EmbedBuilder()
-                    .setColor("#FFC107")
-                    .setTitle("🎰 JACKPOT!")
-                    .setDescription([
-                        `🎉 **${interaction.user}** kena JACKPOT gacha Shards!`,
-                        "",
-                        `Menang 💎 **${result.amount.toLocaleString()} Shards** — sultan baru di sini! 🔥`
-                    ].join("\n"))
-                    .setFooter(EMBED_FOOTER);
-
-                await safeSend(channel, { embeds: [announcement] });
-
+                await safeSend(channel, {
+                    content: `🎰 **${interaction.user}** JACKPOT — 💎 ${result.amount.toLocaleString()} Shards! 🔥`
+                });
             }
 
         }
