@@ -1,11 +1,64 @@
 import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from "discord.js";
 import SHOP_ITEMS, { getShopItem } from "../../config/shopItems.js";
 import { purchaseItem, spendShards, getBalance, isUnlimited } from "../../database/economy.js";
-import { getShopRole } from "../../database/shopRoles.js";
-import { getShopBadge, ownsBadge, grantBadge } from "../../database/shopBadges.js";
+import { getShopRole, getShopRoles } from "../../database/shopRoles.js";
+import { getShopBadge, getShopBadges, ownsBadge, grantBadge } from "../../database/shopBadges.js";
 import { setActiveTheme } from "../../database/profileSettings.js";
 import { EMBED_COLOR, EMBED_FOOTER } from "../../config/constants.js";
 import COLORS from "../../config/colors.js";
+
+/**
+ * Semua yang bisa dibeli, dalam satu daftar: theme + role + badge.
+ * Dipakai /buy buat autocomplete dan /shop buat nampilin daftar.
+ */
+export function getAllBuyables(guildId) {
+
+    const list = [];
+
+    for (const item of SHOP_ITEMS) {
+        list.push({
+            kind: "theme",
+            id: item.id,
+            value: item.id,
+            name: item.name,
+            emoji: item.emoji,
+            price: item.price,
+            description: item.description
+        });
+    }
+
+    for (const role of getShopRoles(guildId)) {
+        list.push({
+            kind: "role",
+            id: role.item_id,
+            value: `role:${role.item_id}`,
+            name: role.name,
+            emoji: role.emoji,
+            price: role.price,
+            description: role.description
+        });
+    }
+
+    for (const badge of getShopBadges(guildId)) {
+        list.push({
+            kind: "badge",
+            id: badge.item_id,
+            value: `badge:${badge.item_id}`,
+            name: badge.name,
+            emoji: badge.emoji,
+            price: badge.price,
+            description: badge.description
+        });
+    }
+
+    return list;
+
+}
+
+/** Pilihan buat autocomplete — maksimal 25 (batas Discord). */
+export function getBuyChoices(guildId) {
+    return getAllBuyables(guildId).slice(0, 25);
+}
 
 export default {
 
@@ -15,8 +68,9 @@ export default {
         .addStringOption(option =>
             option
                 .setName("item")
-                .setDescription("Item: theme id | role:<id> | badge:<id>. Cek /shop buat daftar.")
+                .setDescription("Apa yang mau dibeli — ketik buat nyari (mis. Mythical).")
                 .setRequired(true)
+                .setAutocomplete(true)
         ),
 
     async execute(interaction) {

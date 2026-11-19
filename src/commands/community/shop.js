@@ -37,18 +37,19 @@ export default {
         // ---- Role ----------------------------------------------------
         const roles = getShopRoles(guildId);
         const roleLines = roles.length
-            ? roles.map(r => `${r.emoji} **${r.name}** — 💎 **${r.price.toLocaleString()}**  ·  \`/buy role:${r.item_id}\``)
+            ? roles.map(r => `${r.emoji} **${r.name}** — 💎 **${r.price.toLocaleString()}**`)
             : ["-# Belum ada role dijual."];
 
         // ---- Badge ---------------------------------------------------
         const badges = getShopBadges(guildId);
         const badgeLines = badges.length
-            ? badges.map(b => `${b.emoji} **${b.name}** — 💎 **${b.price.toLocaleString()}**  ·  \`/buy badge:${b.item_id}\``)
+            ? badges.map(b => `${b.emoji} **${b.name}** — 💎 **${b.price.toLocaleString()}**`)
             : ["-# Belum ada badge. Coba \`/gacha\`."];
 
         const embed = new EmbedBuilder()
             .setColor(EMBED_COLOR)
             .setTitle("🛒 Synd1cate Shop")
+            .setDescription("Mau beli apa? Ketik \`/buy\` terus **ketik nama** buat nyari.")
             .addFields(
                 { name: "🎨 Theme Profile", value: themeLines.join("\n\n") },
                 { name: "👑 Role", value: roleLines.join("\n") },

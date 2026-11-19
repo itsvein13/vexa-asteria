@@ -1,4 +1,5 @@
 import { MessageFlags } from "discord.js";
+import { getBuyChoices } from "../commands/community/buy.js";
 
 /**
  * Balas interaction yang gagal dengan pesan error generik (ephemeral).
@@ -31,6 +32,36 @@ export default {
     name: "interactionCreate",
 
     async execute(interaction, client) {
+
+        // Autocomplete — /buy: pilih dari katalog (theme, role, badge).
+        if (interaction.isAutocomplete()) {
+
+            if (interaction.commandName === "buy") {
+
+                const guildId = interaction.guild?.id;
+                const typed = String(
+                    interaction.options.getFocused?.() ?? ""
+                ).toLowerCase();
+
+                const choices = getBuyChoices(guildId)
+                    .filter(c =>
+                        !typed ||
+                        c.name.toLowerCase().includes(typed) ||
+                        c.value.toLowerCase().includes(typed)
+                    )
+                    .slice(0, 25)
+                    .map(c => ({
+                        name: `${c.emoji} ${c.name} — ${c.price.toLocaleString()}`,
+                        value: c.value
+                    }));
+
+                await interaction.respond(choices);
+
+            }
+
+            return;
+
+        }
 
         // Resolve handler sesuai jenis interaction
         let handler = null;
