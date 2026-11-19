@@ -15,14 +15,8 @@ export default {
         .addStringOption(option =>
             option
                 .setName("item")
-                .setDescription("The item to buy.")
+                .setDescription("Item: theme id | role:<id> | badge:<id>. Cek /shop buat daftar.")
                 .setRequired(true)
-                .addChoices(
-                    ...SHOP_ITEMS.map(item => ({
-                        name: `${item.name} — ${item.price.toLocaleString()} Shards`,
-                        value: item.id
-                    }))
-                )
         ),
 
     async execute(interaction) {
@@ -31,7 +25,7 @@ export default {
         const guildId = interaction.guild.id;
         const userId = interaction.user.id;
 
-        // ---- Role yang dijual (opsi A) --------------------------------
+        // ---- Role yang dijual ----------------------------------------
         if (itemId.startsWith("role:")) {
             return buyRole(interaction, itemId.slice(5), guildId, userId);
         }
@@ -54,6 +48,7 @@ export default {
         const result = purchaseItem(userId, guildId, item.id, item.price);
 
         if (!result.ok) {
+
             const msg = result.reason === "owned"
                 ? `Kamu sudah punya ${item.emoji} **${item.name}**.`
                 : `Saldo kurang — butuh 💎 **${item.price.toLocaleString()}**, saldomu **${result.balance.toLocaleString()}**.`;
