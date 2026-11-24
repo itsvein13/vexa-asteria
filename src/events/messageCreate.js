@@ -11,7 +11,7 @@ import { AI_CONFIG } from "../config/ai.config.js";
 import { checkAiQuota, getAiQuota } from "../utils/aiRateLimit.js";
 import { checkCooldown, ask } from "../services/ai/chat.service.js";
 import { extractMentionPrompt, isOwner } from "../utils/aiSecurity.js";
-import { shouldRoast, markRoast, roastLine } from "../utils/asleySlander.js";
+import { shouldRoast, markRoast, roastLine, getRoastContext } from "../utils/asleySlander.js";
 import { matchKeywordRoast } from "../utils/keywordRoast.js";
 
 export default {
@@ -52,13 +52,16 @@ export default {
 
         if (roast) {
 
+            const line = roastLine(roast, message.createdTimestamp);
+
             const sent = await safeSend(message.channel, {
-                content: roastLine(roast, message.createdTimestamp),
+                content: line,
                 allowedMentions: { users: [message.author.id] },
                 reply: { messageReference: message.id }
             });
 
-            if (sent) markRoast(message.author.id);
+            // Simpen teksnya biar AI nyambung kalau dia nanyain lagi.
+            if (sent) markRoast(message.author.id, line);
 
         }
 
@@ -172,7 +175,14 @@ async function handleAiMention(message, client) {
 
     try {
 
-        const { answer } = await ask(prompt);
+        // Konteks roast terakhir — kalau Vexa baru aja ngejek dia,
+        // AI nyambung situ. Nggak panjang, cuma 2 baris.
+        const ctx = getRoastContext(message.author.id);
+        const contextNote = ctx
+            ? `\n\n[Baru ${ctx.ageMinutes} menit lalu Vexa bilang ke lu: "${ctx.line}". Balas singkat (maks 1 kalimat), nyambung ke itu — jangan ulang dari nol.]`
+            : "";
+
+        const { answer } = await ask(prompt + contextNote);
 
         if (!answer) return;
 

@@ -138,52 +138,60 @@ export const AI_CONFIG = {
             userId: "568255840797065235",
             name: "asley",
             lines: [
-                "garing bet lu sley",
-                "iya sley",
-                "pantek lu sley",
-                "yapping mulu sley",
-                "udahan yappingnya?"
+                "amping lu sley",
+                "garing",
+                "apa coba sley"
             ]
         },
         {
             userId: "917684312948744202",
             name: "billson",
             lines: [
-                "garing bet",
-                "so a6",
-                "dasar termul",
-                "billson puantek",
-                "diemin aja lg monolog dia wkwk"
+                "garing lu bil",
+                "so a6 ajg wkwk",
+                "ngomong sama tembok ni orang"
             ]
         },
         {
             userId: "760063132700770336",
             name: "sipu",
             lines: [
-                "ada sipu bubar aja cok",
-                "sipu pante gajelas",
-                "garing bet sipu jing"
+                "ccd lu sipu",
+                "bocah gajelas apasih",
+                "ngomong apesih lu?"
+            ]
+        },
+        {
+            userId: "1187587739600834644",
+            name: "hugo",
+            lines: [
+                "bocil amping",
+                "autis lu njing",
+                "garing bet dah ni bocah",
+                "pulang aja njir gajelas bet",
+                "hugo paok"
             ]
         }
     ],
-    // 1x seminggu per orang.
+    // Maksimal 2x seminggu per orang.
+    roastMaxPerWeek: 2,
     roastWindowMs: 7 * DAY,
 
-    // Trigger kata kunci: Billson ngetik "apaa"/"apaan" -> Vexa bales
-    // langsung (nggak nunggu jadwal roast). Cooldown biar nggak numpuk.
-    keywordRoasts: [
-        {
-            userId: "917684312948744202",
-            name: "billson",
-            keywords: ["apaa", "apaan", "apaaan", "apah"],
-            lines: [
-                "Apaantat ya anjg lu tai",
-                "apaaan? apaan tuh",
-                "lu tanya apaan? anjg"
-            ]
-        }
-    ],
-    keywordRoastCooldownMs: 30 * 1000,
+    // Trigger kata kunci universal: siapa aja ngetik "apaa"/"apaan"
+    // -> dibalas. Cooldown biar nggak numpuk.
+    keywordRoasts: {
+        keywords: ["apaa", "apaan", "apaaan", "apah"],
+        lines: [
+            "Apaantat goblok lu paok",
+            "apaan tuh? paok",
+            "lu tanya apa? goblok"
+        ],
+        cooldownMs: 30 * 1000
+    },
+
+    // Konteks roast buat AI: kalau orang yang baru di-roast nanyain
+    // Vexa dalam 15 menit, AI tau barusan ngomong apa.
+    roastContextMs: 15 * 60 * 1000,
 
     // Pesan pas limit user habis.
     limitMessage: (minutes) => {

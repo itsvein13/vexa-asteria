@@ -1,48 +1,41 @@
 import { AI_CONFIG } from "../config/ai.config.js";
 
 /**
- * Trigger kata kunci — Billson ngetik "apaa"/"apaan" dll, Vexa
- * bales langsung (nggak nunggu jadwal roast mingguan).
+ * Trigger kata kunci universal — siapa aja ngetik "apaa"/"apaan" dll,
+ * dibalas langsung (nggak nunggu jadwal roast).
  *
- * Cooldown per user biar nggak numpuk kalau dia ngetik beruntun.
+ * Cooldown global per user biar nggak numpuk.
  */
 
 const cooldowns = new Map();
 
-function findKeywordTarget(userId) {
-
-    const id = String(userId ?? "");
-
-    return AI_CONFIG.keywordRoasts?.find(t => String(t.userId) === id) ?? null;
-
-}
-
 /**
- * Cek apakah pesan ini cocok dengan keyword target, dan cooldown-nya
- * udah lewat. Balikin { target, line } atau null.
+ * Cek apakah pesan ini kena keyword. Balikin { line } atau null.
  */
 export function matchKeywordRoast(message, now = Date.now()) {
 
-    const target = findKeywordTarget(message?.author?.id);
+    const cfg = AI_CONFIG.keywordRoasts;
 
-    if (!target) return null;
+    if (!cfg) return null;
 
     const text = String(message?.content ?? "").toLowerCase();
 
-    const hit = target.keywords.some(kw => text.includes(String(kw).toLowerCase()));
+    const hit = (cfg.keywords ?? []).some(kw => text.includes(String(kw).toLowerCase()));
 
     if (!hit) return null;
 
-    const cooldown = AI_CONFIG.keywordRoastCooldownMs ?? 30 * 1000;
-    const last = cooldowns.get(String(message.author.id)) ?? 0;
+    const cooldown = cfg.cooldownMs ?? 30 * 1000;
+    const key = String(message?.author?.id ?? "dm");
+    const last = cooldowns.get(key) ?? 0;
 
     if (now - last < cooldown) return null;
 
-    cooldowns.set(String(message.author.id), now);
+    cooldowns.set(key, now);
 
-    const index = Math.floor(Math.random() * target.lines.length);
+    const lines = cfg.lines ?? [];
+    const line = lines.length ? lines[Math.floor(Math.random() * lines.length)] : "";
 
-    return { target, line: target.lines[index] };
+    return { line };
 
 }
 
