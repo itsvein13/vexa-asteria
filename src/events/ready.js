@@ -89,18 +89,10 @@ export default {
         async function updatePresence() {
 
             const activities = [
-                { name: "sibuk nggak sibuk", type: ActivityType.Watching },
-                { name: "lowkey standby", type: ActivityType.Playing },
-                { name: "nggak alih-alih, emang nggak", type: ActivityType.Watching },
-                { name: "gaskeun? gue masih di sini", type: ActivityType.Playing },
-                { name: "lagi mid, jangan ganggu", type: ActivityType.Watching },
-                { name: "chat lu nanti gue bales", type: ActivityType.Playing },
-                { name: "no cap, cuma standby", type: ActivityType.Playing },
-                { name: "mood tipis, ditipisin", type: ActivityType.Watching },
-                { name: "touch grass dulu", type: ActivityType.Playing },
-                { name: "lagi sok sibuk", type: ActivityType.Watching },
-                { name: "nggak rate rate, santai", type: ActivityType.Playing },
-                { name: "main character energy", type: ActivityType.Playing }
+                { name: "jgn baper sama gua, gua bot", type: ActivityType.Playing },
+                { name: "doomscrolling", type: ActivityType.Playing },
+                { name: "jgn ribet, ntr gua ban", type: ActivityType.Playing },
+                { name: "sorry ya lagi day1 soalnya", type: ActivityType.Playing }
             ];
 
             const current = activities[index];
