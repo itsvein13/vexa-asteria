@@ -177,17 +177,8 @@ export const AI_CONFIG = {
     roastMaxPerWeek: 1,
     roastWindowMs: 7 * DAY,
 
-    // Trigger kata kunci universal: siapa aja ngetik "apaa"/"apaan"
-    // -> dibalas. Jatah 1x seminggu per user, biar nggak nyebelin.
-    keywordRoasts: {
-        keywords: ["apaa", "apaan", "apaaan", "apah"],
-        lines: [
-            "Apaantat goblok lu paok",
-            "apaan tuh? paok",
-            "lu tanya apa? goblok"
-        ],
-        cooldownMs: 7 * DAY
-    },
+    // Trigger kata kunci "apaa"/"apaan" udah gue hapus.
+    keywordRoasts: null,
 
     // Konteks roast buat AI: kalau orang yang baru di-roast nanyain
     // Vexa dalam 15 menit, AI tau barusan ngomong apa.
