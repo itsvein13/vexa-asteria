@@ -173,8 +173,8 @@ export const AI_CONFIG = {
             ]
         }
     ],
-    // Maksimal 2x seminggu per orang.
-    roastMaxPerWeek: 2,
+    // Maksimal 1x seminggu per orang.
+    roastMaxPerWeek: 1,
     roastWindowMs: 7 * DAY,
 
     // Trigger kata kunci universal: siapa aja ngetik "apaa"/"apaan"
