@@ -178,7 +178,7 @@ export const AI_CONFIG = {
     roastWindowMs: 7 * DAY,
 
     // Trigger kata kunci universal: siapa aja ngetik "apaa"/"apaan"
-    // -> dibalas. Cooldown biar nggak numpuk.
+    // -> dibalas. Jatah 1x seminggu per user, biar nggak nyebelin.
     keywordRoasts: {
         keywords: ["apaa", "apaan", "apaaan", "apah"],
         lines: [
@@ -186,7 +186,7 @@ export const AI_CONFIG = {
             "apaan tuh? paok",
             "lu tanya apa? goblok"
         ],
-        cooldownMs: 30 * 1000
+        cooldownMs: 7 * DAY
     },
 
     // Konteks roast buat AI: kalau orang yang baru di-roast nanyain
